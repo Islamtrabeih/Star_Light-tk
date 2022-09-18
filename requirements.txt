@@ -1,0 +1,1 @@
+pip install openpyxl pandas plotly.express astropy dash poliastro future pillow python-dateutil
