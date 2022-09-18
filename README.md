@@ -1,7 +1,7 @@
 ![text2330](https://user-images.githubusercontent.com/102483385/190897236-cca2d4f9-7a4a-44c7-b0ff-53696f95719e.png)
 # Star_Light-tk
 A UI that analyses the satellite track and space environment forecasting.
-This version is still on edit and test mode.
+This version is still on reduce backages, editing and testing mode.
 
 
 ## The light waight UI of Star_Light Project.
