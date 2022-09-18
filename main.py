@@ -15,7 +15,7 @@ window.overrideredirect(1)
 
 image = Image.open("data/icons/1.jpg")
 if image.size != (427, 250):
-    image = image.resize((427, 250), Image.ANTIALIAS)
+    image = image.resize((427, 250), Image.Resampling.LANCZOS)
 image = ImageTk.PhotoImage(image)
 bg_label = Label(window, image=image)
 bg_label.place(x=0, y=0, relwidth=1, relheight=1)
@@ -67,5 +67,4 @@ lst2 = ('Times New Roman', 13)
 l2.config(font=lst2)
 l2.place(x=10, y=80)
 
-# window.wm_attributes("-transparentcolor", 'black')
 window.mainloop()

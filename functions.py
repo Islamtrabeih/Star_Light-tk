@@ -20,14 +20,13 @@ import sys
 import os
 
 
-# ----------------------------------------------------------------------------------------------------------------------
 # main functions
 # ----------------------------------------------------------------------------------------------------------------------
 
 
 def about():
-    about_win = Toplevel(height=550, width=900)
-    about_win.minsize(height=550, width=900)
+    about_win = Toplevel(height=400, width=567)
+    about_win.minsize(height=400, width=567)
     about_win.resizable(False, False)
 
     columns1 = ('#1', '#2', '#3')
@@ -35,42 +34,13 @@ def about():
     tree1.heading('#1', text='Students')
     tree1.heading('#2', text='Sections')
     tree1.heading('#3', text='Email')
-    contacts1 = [('Islam Reda Ahmed', 'Tab[Theoretical(1,2,3,6), Pro(1,2,3,4,5,6)]',
-                 'islamtrabeih.me@gmail.com'), ('Mohamed Abd_Elaleem Mohamed',
-                 'Orbit Lifetime[Theoretical, Pro]', 'mohamed3lam22@gmail.com'), ('Mahmoud Adel mohamed',
-                 'Theoretical: CME', 'mahmoud.adel2810@gmail.com'),
-                 ('Mustafa Saied ElSayed', 'Theoretical: Debris, IPM', 'mustafasaied454@gmail.com'),
-                 ('Islam Mohamed Ibrahim', 'Theoretical: Geomagnitic storm,  AO and Ozone',
-                 'wwwislamemaracom1@gmail.com'), ('Ahmed Mamdouh Ghanem', 'Theoretical: Flair, Solar f10.7',
-                 'ahmedmamdouh2248@gmail.com'), ('Mahmoud Mohamed Ali', 'Theoretical: Solar Wind',
-                 'mahmoud01022006138@gmail.com'), ('Ahmed ElHanoney Mohamed', 'Boundary layer Analysis',
-                 'ahmedhanoney7@gmail.com'), ('Read Essa Mahmoud ', 'Boundary layer Analysis',
-                 'redaesaa1797@gmail.com'), ('Taha Fekry Ahmed', 'Boundary layer Analysis', 'fekrytaha46@gmail.com')]
+    contacts1 = [('Islam Reda Ahmed', 'Astronomy', 'islamtrabeih.me@gmail.com'), ('Rahma Ashraf Khalil', 'Physics', 'RahmaAshraf64@gmail.com')]
     for contact in contacts1:
         tree1.insert('', END, values=contact)
     tree1.pack(side=BOTTOM, fill='x')
 
-    columns = ('#1', '#2', '#3')
-    tree = ttk.Treeview(about_win, columns=columns, show='headings')
-    tree.heading('#1', text='Supervisor')
-    tree.heading('#2', text='Orgnization')
-    tree.heading('#3', text='Email')
-    contacts = [('Kamel Abdelatif Khalil Gadallah', 'Al-Azhar, Faculity of science', 'k.gadallah@azhar.edu.eg'),
-                ('Wael Mohamed Mahmoud', 'EgSA', 'wael.mohamed@egsa.gov.eg'),
-                ('Abdelrazek kasem shaltout', 'Al-Azhar, Faculity of science', 'shaltout123@gmail.com'),
-                ('Ahmed Mohamed Abdelbar', 'Al-Azhar, Faculity of science', 'ahmed_bar86@azhar.edu.eg'),
-                ('Ahmed Hafez Mohammed', 'Al-Azhar, Faculity of science', 'ahmed_hafez@azhar.edu.eg'),
-                ('Abdelrahman Mouner Ahmed', 'Al-Azhar, Faculity of science', 'abdelra123@gmail.com'),
-                ('Ramy Mawad', 'Al-Azhar, Faculity of science', 'ramy@azhar.edu.eg'),
-                ('Ali Gamal awis', 'Al-Azhar, Faculity of science', 'ali.astro@azhar.edu.eg'),
-                ('Inal Adham Hassan', 'Al-Azhar, Faculity of science', 'inalds_hassan@yahoo.com'),
-                ('Mostafa Mohamed Abdel Aziz', 'Al-Azhar, Faculity of science', 'mostafa_morsy@azhar.edu.eg')]
-    for contact in contacts:
-        tree.insert('', END, values=contact)
-    tree.pack(side=BOTTOM, fill='both')
-
     data1 = StringVar()
-    data1.set("Low Earth Orbit Program \nBy: Al_Azhar University students 2021")
+    data1.set("Low Earth Orbit Program \nBy: Star_Light Team 2021")
     label_Dir = Message(about_win, textvariable=data1, width=1000)
     lst2 = ('Times New Roman', 13)
     label_Dir.config(font=lst2)
@@ -86,7 +56,6 @@ def help_index():
     os.system('information.pdf')
 
 
-# ----------------------------------------------------------------------------------------------------------------------
 # main functions
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -243,7 +212,6 @@ def data_plot(height0, checkbox, yy, mm, xx):
     # fig.write_image("images/fig1.png")
 
 
-# ----------------------------------------------------------------------------------------------------------------------
 # irradiance functions
 # ----------------------------------------------------------------------------------------------------------------------
 

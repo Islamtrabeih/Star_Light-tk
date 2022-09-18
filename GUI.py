@@ -1,20 +1,20 @@
 from tkinter.filedialog import asksaveasfile
 from functions import *
-# from tkinter import *
-# from tkinter import ttk
+#from tkinter import *       #
+#from tkinter import ttk     #
 from ttkthemes import ThemedTk
 import sys
 
 
 window = ThemedTk(theme = "arc")
 window.title("Star-Light")
-positionRight = int(window.winfo_screenwidth()/4)
+positionRight = int(window.winfo_screenwidth()/10)
 positionDown = int(window.winfo_screenheight()/10)
 window.geometry("+{}+{}".format(positionRight, positionDown))
 # window.iconphoto(False, PhotoImage(file='data/icons/ursa-major.ico'))
-# window.tk.call("source", "forest/forest-light.tcl")
+window.tk.call("source", "sun-valley/sv.tcl")
 # ttk.Style().theme_use('forest-light')
-# window.tk.call("set_theme", "dark")
+window.tk.call("set_theme", "dark")
 
 
 # window
@@ -162,6 +162,10 @@ tab1.grid_rowconfigure(0, weight=1)
 # ---------------------------------------------------------------------------------------------------------------------
 
 
+tab1.grid_columnconfigure(0, weight=1)
+tab1.grid_rowconfigure(0, weight=1)
+
+
 def atmo_save():
     try:
         file = asksaveasfile(filetypes=[('All Files', '*.*'),
@@ -287,33 +291,28 @@ def data_plot1():
         result2.insert('0.0', "Invalid Height or select the Argument")
 
 
-atmo_lbl = ttk.Label(tab1, text='-- Regression for Atmosphere Properties --', foreground="black", anchor=CENTER,
-                 font=("Times New Roman", 15))
-atmo_lbl.grid(column=0, row=0, columnspan=5, sticky="NSEW")
+atm_inputs = ttk.LabelFrame(tab1, text="inputs")
+atm_inputs.grid(column=0, row=0, columnspan=2, sticky="WE", padx=5, pady=0, ipadx=0, ipady=0)
+atm_outputs = ttk.LabelFrame(tab1, text="result")
+atm_outputs.grid(column=0, row=1, columnspan=2, sticky="WE", padx=5, pady=0, ipadx=0, ipady=0)
 
 # date label
 date = StringVar()
 date.set("Date :                 ")
-labelDir = ttk.Label(tab1, textvariable=date)
+labelDir = ttk.Label(atm_inputs, textvariable=date)
 labelDir.grid(column=0, row=1)
 
-# months options button
-# months = ["month",1 , 2 , 3 , 4 , 5 , 6 , 7 , 8 , 9 , 10 , 11 , 12]
+# month Combobox
 month_list = IntVar(None)
 month_list.set("Month")
-month = ttk.Combobox(tab1, width=15, textvariable=month_list)
+month = ttk.Combobox(atm_inputs, width=15, textvariable=month_list)
 month['values'] = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
-# month = ttk.OptionMenu(tab1, month_list, *months)
 month.grid(column=1, row=1)
 
-# years options button
-# years = ["years",1996 , 1997 , 1998 , 1999 , 2000 , 2001 , 2002 , 2003 , 2004 , 2005 , 2006 , 2007 ,
-#          2008 , 2009 , 2010 , 2011 , 2012 , 2013 , 2014 , 2015 , 2016 , 2017 , 2018 , 2019 , 2020,
-#          2021 , 2022 , 2023 , 2024 , 2025 , 2026 , 2027 , 2028 , 2029 , 2030]
+# years Combobox
 year_list = IntVar(None)
 year_list.set("Year")
-# year = ttk.OptionMenu(tab1, year_list, *years)
-year = ttk.Combobox(tab1, width=15, textvariable=year_list)
+year = ttk.Combobox(atm_inputs, width=15, textvariable=year_list)
 year['values'] = (1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
                   2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,
                   2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030)
@@ -322,49 +321,42 @@ year.grid(column=2, row=1)
 # height label
 height = StringVar(None)
 height.set("Height :             ")
-height_lbl = ttk.Label(tab1, textvariable=height)
+height_lbl = ttk.Label(atm_inputs, textvariable=height)
 height_lbl.grid(column=0, row=2)
 
 # height options
 height_list = IntVar(None)
 height_list.set("Height in Km")
-height1 = ttk.Combobox(tab1, width=15, textvariable=height_list)
+height1 = ttk.Combobox(atm_inputs, width=15, textvariable=height_list)
 height1['values'] = (100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650,
                      700, 750, 800, 850, 900, 950, 1000)
 height1.grid(column=1, row=2)
 
-# label
-atmo_prop = ttk.Label(tab1, text='-- Choose the Property --', foreground="black", anchor=CENTER,
-                  font=("Times New Roman", 11))
-atmo_prop.grid(column=0, row=3, columnspan=5, sticky="NSEW")
-
 # Check buttons
 density1 = IntVar()
-ttk.Checkbutton(tab1, text="Density", variable=density1).grid(column=1, row=4, sticky=NW)
+ttk.Checkbutton(atm_inputs, text="Density", variable=density1, style="Switch.TCheckbutton").grid(column=1, row=4, sticky=NW)
 Ar_atoms1 = IntVar()
-ttk.Checkbutton(tab1, text="Argon", variable=Ar_atoms1).grid(column=1, row=5, sticky=NW)
+ttk.Checkbutton(atm_inputs, text="Argon", variable=Ar_atoms1, style="Switch.TCheckbutton").grid(column=1, row=5, sticky=NW)
 He_atoms1 = IntVar()
-ttk.Checkbutton(tab1, text="Helium", variable=He_atoms1).grid(column=1, row=6, sticky=NW)
+ttk.Checkbutton(atm_inputs, text="Helium", variable=He_atoms1, style="Switch.TCheckbutton").grid(column=1, row=6, sticky=NW)
 temperature1 = IntVar()
-ttk.Checkbutton(tab1, text="Temperature", variable=temperature1).grid(column=2, row=4, sticky=NW)
+ttk.Checkbutton(atm_inputs, text="Temperature", variable=temperature1, style="Switch.TCheckbutton").grid(column=2, row=4, sticky=NW)
 N2_molecules1 = IntVar()
-ttk.Checkbutton(tab1, text="N Molecules", variable=N2_molecules1).grid(column=2, row=5, sticky=NW)
+ttk.Checkbutton(atm_inputs, text="N Molecules", variable=N2_molecules1, style="Switch.TCheckbutton").grid(column=2, row=5, sticky=NW)
 O2_molecules1 = IntVar()
-ttk.Checkbutton(tab1, text="O Molecules", variable=O2_molecules1).grid(column=2, row=6, sticky=NW)
+ttk.Checkbutton(atm_inputs, text="O Molecules", variable=O2_molecules1, style="Switch.TCheckbutton").grid(column=2, row=6, sticky=NW)
 O_atoms1 = IntVar()
-ttk.Checkbutton(tab1, text="O Atoms", variable=O_atoms1).grid(column=3, row=4, sticky=NW)
+ttk.Checkbutton(atm_inputs, text="O Atoms", variable=O_atoms1, style="Switch.TCheckbutton").grid(column=3, row=4, sticky=NW)
 N_atoms1 = IntVar()
-ttk.Checkbutton(tab1, text="N Atoms", variable=N_atoms1).grid(column=3, row=5, sticky=NW)
+ttk.Checkbutton(atm_inputs, text="N Atoms", variable=N_atoms1, style="Switch.TCheckbutton").grid(column=3, row=5, sticky=NW)
 H_atoms1 = IntVar()
-ttk.Checkbutton(tab1, text="Hydrogen", variable=H_atoms1).grid(column=3, row=6, sticky=NW)
+ttk.Checkbutton(atm_inputs, text="Hydrogen", variable=H_atoms1, style="Switch.TCheckbutton").grid(column=3, row=6, sticky=NW)
 
 # output
-result0 = ttk.Button(tab1, text='Result', width=10, command=show_result)
+result0 = ttk.Button(atm_outputs, text='Result', width=10, command=show_result)
 result0.grid(row=7, column=0, sticky=N, padx=0, pady=0)
-# result1 = Entry(tab1, justify=LEFT, relief="flat")
 # flat, groove, raised, ridge, solid, or sunken
-#result1 = scrolledtext.ScrolledText(tab1, width=82, height=4, font=("Times New Roman", 10), relief="solid")
-atmo_frame = ttk.Frame(tab1, style='new.TFrame')
+atmo_frame = ttk.Frame(atm_outputs, style='new.TFrame')
 atmo_frame.grid(row=7, column=1, ipadx=10, ipady=0, sticky="NSEW", rowspan=1, columnspan=3)
 result1 = Text(atmo_frame, wrap="none", width=82, height=4, font=("Times New Roman", 10), relief="solid")
 vsb = ttk.Scrollbar(atmo_frame, command=result1.yview, orient="vertical")
@@ -374,12 +366,13 @@ atmo_frame.grid_columnconfigure(0, weight=1)
 vsb.grid(row=0, column=1, sticky="ns")
 result1.grid(row=0, column=0, sticky="nsew")
 
-Plot1 = ttk.Button(tab1, text='Plot', width=10, command=data_plot1)
+# buttons
+Plot1 = ttk.Button(atm_outputs, text='Plot', width=10, command=data_plot1)
 Plot1.grid(row=10, column=0, sticky=N, padx=0, pady=0)
-save1 = ttk.Button(tab1, text='save', width=10, command=atmo_save)
+save1 = ttk.Button(atm_outputs, text='save', width=10, command=atmo_save)
 save1.grid(row=11, column=0, sticky=N, padx=0, pady=0)
 
-atmo_frame_2 = ttk.Frame(tab1)
+atmo_frame_2 = ttk.Frame(atm_outputs)
 atmo_frame_2.grid(row=10, column=1, ipadx=10, ipady=0, sticky="NSEW", rowspan=3, columnspan=3)
 result2 = Text(atmo_frame_2, wrap="none", width=82, height=19, font=("Times New Roman", 10), relief="solid")
 vsb_atm2 = ttk.Scrollbar(atmo_frame_2, command=result2.yview, orient="vertical")
@@ -389,18 +382,21 @@ atmo_frame_2.grid_columnconfigure(0, weight=1)
 vsb_atm2.grid(row=0, column=1, sticky="ns")
 result2.grid(row=0, column=0, sticky="nsew")
 
-#result2 = scrolledtext.ScrolledText(tab1, width=82, height=19, font=("Times New Roman", 10), relief="solid")
-#result2.grid(row=10, column=1, ipadx=10, ipady=0, sticky="NSEW", rowspan=3, columnspan=3)
+for col in range(4):
+    atm_inputs.columnconfigure(col, weight=1)
+for col in range(4):
+    atm_outputs.columnconfigure(col, weight=1)
+for row in range(4):
+    atm_inputs.rowconfigure(row, weight=1)
+for row in range(6):
+    atm_outputs.rowconfigure(row, weight=1)
 
-tab1.rowconfigure(0, weight=1)
-for col in range(5):
-    tab1.columnconfigure(col, weight=1)
-tab1.rowconfigure(10, weight=1)
 
-
-# ---------------------------------------------------------------------------------------------------------------------
 # irradiance
 # ---------------------------------------------------------------------------------------------------------------------
+
+tab2.grid_columnconfigure(0, weight=1)
+tab2.grid_rowconfigure(0, weight=1)
 
 
 def irr_result():
@@ -442,50 +438,45 @@ def irr_save():
         x = 1
 
 
-irr_lbl = ttk.Label(tab2, text='-- Regression for Solar Irradiance --', foreground="black", anchor=CENTER,
-                font=("Times New Roman", 15))
-irr_lbl.grid(column=0, row=0, columnspan=5)
 
-# date label
-#irr_date = ttk.Label(tab2, textvariable=date)
-#irr_date.grid(column=0, row=1)
+irr_inputs = ttk.LabelFrame(tab2, text="inputs")
+irr_inputs.grid(column=0, row=0, columnspan=2, sticky="WE", padx=5, pady=0, ipadx=0, ipady=0)
+irr_outputs = ttk.LabelFrame(tab2, text="result")
+irr_outputs.grid(column=0, row=1, columnspan=2, sticky="WE", padx=5, pady=0, ipadx=0, ipady=0)
 
 # months options button
-month = ttk.Combobox(tab2, width=15, textvariable=month_list)
+month = ttk.Combobox(irr_inputs, width=15, textvariable=month_list)
 month['values'] = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
 month.grid(column=1, row=1)
 
 # years options button
-year = ttk.Combobox(tab2, width=15, textvariable=year_list)
+year = ttk.Combobox(irr_inputs, width=15, textvariable=year_list)
 year['values'] = (1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
                   2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,
                   2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030)
 year.grid(column=2, row=1)
 
-# label
-lat = ttk.Label(tab2, text='Inclination :     ')
+# Labels
+date_irr = ttk.Label(irr_inputs, text='Date :         ')
+date_irr.grid(column=0, row=1)
+lat = ttk.Label(irr_inputs, text='Inclination :')
 lat.grid(column=0, row=2)
 
 # Inclination Entry
-lat_enter = ttk.Entry(tab2, justify='center', width=17)
-lat_enter.insert(0, 'Irradiance')
-lat_enter.grid(column=1, row=2)
-# relief = (flat, groove, raised, ridge, solid, or sunken) shape in tk
+lat_enter = ttk.Spinbox(irr_inputs, from_= 0, to_= 360, width = 11)
+lat_enter.grid(column=1, row=2, padx=0, pady=10)
 
-irr_lbl = ttk.Label(tab2, text='-- Irradiance --', foreground="black", anchor=CENTER,
-                font=("Times New Roman", 11))
-irr_lbl.grid(column=0, row=3, columnspan=5, rowspan=2)
-
-result3 = ttk.Button(tab2, text='Result', width=10, command=irr_result)
+# Buttons
+result3 = ttk.Button(irr_outputs, text='Result', width=10, command=irr_result)
 result3.grid(row=5, column=0, sticky=N, padx=0, pady=0)
-result4 = ttk.Entry(tab2, justify=LEFT)
+result4 = ttk.Entry(irr_outputs, justify=LEFT)
 result4.grid(row=5, column=1, ipadx=0, ipady=0, columnspan=3, sticky="NSEW")
-Plot2 = ttk.Button(tab2, text='Plot', width=10, command=irr_plot2)
+Plot2 = ttk.Button(irr_outputs, text='Plot', width=10, command=irr_plot2)
 Plot2.grid(row=6, column=0, sticky=N, padx=0, pady=0)
-save2 = ttk.Button(tab2, text='save', width=10, command=irr_save)
+save2 = ttk.Button(irr_outputs, text='save', width=10, command=irr_save)
 save2.grid(row=7, column=0, sticky=N, padx=0, pady=0)
 
-irr_frame = ttk.Frame(tab2)
+irr_frame = ttk.Frame(irr_outputs)
 irr_frame.grid(row=6, column=1, ipadx=10, ipady=0, sticky="NSEW", rowspan=2, columnspan=3)
 result5 = Text(irr_frame, wrap="none", width=82, height=19, font=("Times New Roman", 10), relief="solid")
 vsb_irr = ttk.Scrollbar(irr_frame, command=result5.yview, orient="vertical")
@@ -495,16 +486,16 @@ irr_frame.grid_columnconfigure(0, weight=1)
 vsb_irr.grid(row=0, column=1, sticky="ns")
 result5.grid(row=0, column=0, sticky="nsew")
 
-#result5 = scrolledtext.ScrolledText(tab2, width=82, height=19, font=("Times New Roman", 10), relief="solid")
-#result5.grid(row=6, column=1, ipadx=9, ipady=0, sticky="NSEW", rowspan=3, columnspan=3)
+for col in range(4):
+    irr_inputs.columnconfigure(col, weight=1)
+for col in range(4):
+    irr_outputs.columnconfigure(col, weight=1)
+for row in range(4):
+    irr_inputs.rowconfigure(row, weight=1)
+for row in range(4):
+    irr_outputs.rowconfigure(row, weight=1)
 
-tab2.rowconfigure(0, weight=1)
-for col in range(5):
-    tab2.columnconfigure(col, weight=1)
-tab2.rowconfigure(6, weight=1)
 
-
-# ---------------------------------------------------------------------------------------------------------------------
 # orbital drag
 # ---------------------------------------------------------------------------------------------------------------------
 
@@ -626,17 +617,12 @@ life_frame.grid_columnconfigure(0, weight=1)
 vsb_life.grid(row=0, column=1, sticky="ns")
 orbitdrag.grid(row=0, column=0, sticky="nsew")
 
-#orbitdrag = scrolledtext.ScrolledText(tab3, width=82, height=19, font=("Times New Roman", 10), relief="solid")
-#orbitdrag.grid(row=9, column=1, ipadx=9, ipady=0, sticky="NSEW", rowspan=3, columnspan=3)
-
-
 tab3.rowconfigure(0, weight=1)
 for col in range(5):
     tab3.columnconfigure(col, weight=1)
 tab3.rowconfigure(9, weight=1)
 
 
-# ---------------------------------------------------------------------------------------------------------------------
 # cme activity
 # ---------------------------------------------------------------------------------------------------------------------
 
@@ -781,7 +767,6 @@ for col in range(5):
 tab4.rowconfigure(6, weight=1)
 
 
-# ---------------------------------------------------------------------------------------------------------------------
 # debris
 # ---------------------------------------------------------------------------------------------------------------------
 
@@ -918,7 +903,6 @@ for col in range(5):
 tab5.rowconfigure(7, weight=1)
 
 
-# ---------------------------------------------------------------------------------------------------------------------
 # orbital visiualization
 # ---------------------------------------------------------------------------------------------------------------------
 
@@ -1067,15 +1051,13 @@ for col in range(5):
 tab6.rowconfigure(9, weight=1)
 
 
-# ---------------------------------------------------------------------------------------------------------------------
 # window pack
 # ---------------------------------------------------------------------------------------------------------------------
 
 while True:
-    window.wm_minsize(625, 567)
+    window.wm_minsize(1100, 600)
     window.resizable(True, True)
     tab_control.pack(expand=True, fill='both')
     # window.state('zoomed')
     # window.wm_attributes("-transparentcolor", 'white')
-
     window.mainloop()
