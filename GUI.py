@@ -2,7 +2,7 @@ from tkinter.filedialog import asksaveasfile
 from functions import *
 #from tkinter import *       #
 #from tkinter import ttk     #
-from ttkthemes import ThemedTk
+#from ttkthemes import ThemedTk
 import sys
 
 
@@ -97,6 +97,13 @@ def help_index():
     os.system('information.pdf')
 
 
+def change_theme():
+    if window.tk.call("ttk::style", "theme", "use") == "sun-valley-dark":
+        window.tk.call("set_theme", "light")
+    elif window.tk.call("ttk::style", "theme", "use") == "sun-valley-light":
+        window.tk.call("set_theme", "dark")
+
+
 menu_bar = Menu(window, background='black', foreground='white', activebackground='orange',
                 activeforeground='black', relief='flat')
 file_menu = Menu(menu_bar, tearoff=0)
@@ -107,39 +114,33 @@ file_menu.add_command(label="Save", compound='left', command=pro_save_as, backgr
                       foreground='white', activebackground='orange', activeforeground='black')
 file_menu.add_command(label="Save as...", compound='left', command=pro_save_as, background='black',
                       foreground='white', activebackground='orange', activeforeground='black')
+file_menu.add_command(label="Dark-Light", compound='left', command=change_theme, background='black',
+                      foreground='white', activebackground='orange', activeforeground='black')
 file_menu.add_command(label="Close", compound='left', command=sys.exit, background='black',
                       foreground='white', activebackground='orange', activeforeground='black')
 file_menu.bind("<Control-Q>", sys.exit)
 menu_bar.add_cascade(label="File", menu=file_menu)
-
 help_menu = Menu(menu_bar, tearoff=0)
 help_menu.add_command(label="Help Index", compound='left', command=help_index, background='black',
                       foreground='white', activebackground='orange', activeforeground='black')
 help_menu.add_command(label="About...", compound='left', command=about, background='black',
                       foreground='white', activebackground='orange', activeforeground='black')
 menu_bar.add_cascade(label="Help", menu=help_menu)
-
 window.config(menu=menu_bar)
-
-# styles
-#bc = "gray"
-#fc = "black"
-#s = ttk.Style()
-#s.configure('TFrame', background=bc, foreground=fc)
-#s.configure('TCombobox', background=bc,
-                         #fieldbackground=bc,
-                         #foreground=fc,
-                         #darkcolor=bc,
-                         #selectbackground="grey",
-                         #lightcolor="lime")
-#s.configure('TCheckbutton', background=bc, foreground=fc)
-#s.configure('TButton', background=bc, foreground=fc)
-#s.configure('TLabel', background=bc, foreground=fc)
-#s.configure('TEntry', background=bc, foreground=fc)
-#s.configure('TNotebook', background=bc, foreground=fc)
-#s.configure('TLabelFrame', background=bc, foreground=fc)
-#s.configure('Vertical.TScrollbar', background=bc, foreground=fc)
-
+'''
+bc = "gray"
+fc = "black"
+s = ttk.Style()
+s.configure('TFrame', background=bc, foreground=fc)
+s.configure('TCombobox', background=bc, fieldbackground=bc, foreground=fc, darkcolor=bc, selectbackground="grey", lightcolor="lime")
+s.configure('TCheckbutton', background=bc, foreground=fc)
+s.configure('TButton', background=bc, foreground=fc)
+s.configure('TLabel', background=bc, foreground=fc)
+s.configure('TEntry', background=bc, foreground=fc)
+s.configure('TNotebook', background=bc, foreground=fc)
+s.configure('TLabelFrame', background=bc, foreground=fc)
+s.configure('Vertical.TScrollbar', background=bc, foreground=fc)
+'''
 # tabs
 tab_control = ttk.Notebook(window)
 tab1 = ttk.Frame(tab_control) #relief="solid"
@@ -154,8 +155,6 @@ tab_control.add(tab3, text='Orbital Lifetime')
 tab_control.add(tab4, text='Solar Activity')
 tab_control.add(tab5, text='LEO Debris')
 tab_control.add(tab6, text='Visualization')
-tab1.grid_columnconfigure(0, weight=1)
-tab1.grid_rowconfigure(0, weight=1)
 
 
 # atmosphere
@@ -301,35 +300,28 @@ date = StringVar()
 date.set("Date :                 ")
 labelDir = ttk.Label(atm_inputs, textvariable=date)
 labelDir.grid(column=0, row=1)
-
 # month Combobox
 month_list = IntVar(None)
-month_list.set("Month")
+month_list.set("month")
 month = ttk.Combobox(atm_inputs, width=15, textvariable=month_list)
-month['values'] = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+month['values'] = [i for i in range(1, 13)]
 month.grid(column=1, row=1)
-
 # years Combobox
 year_list = IntVar(None)
-year_list.set("Year")
+year_list.set("year")
 year = ttk.Combobox(atm_inputs, width=15, textvariable=year_list)
-year['values'] = (1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-                  2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,
-                  2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030)
+year['values'] = [i for i in range(1996, 2031)]
 year.grid(column=2, row=1)
-
 # height label
 height = StringVar(None)
 height.set("Height :             ")
 height_lbl = ttk.Label(atm_inputs, textvariable=height)
 height_lbl.grid(column=0, row=2)
-
 # height options
 height_list = IntVar(None)
-height_list.set("Height in Km")
+height_list.set("height in Km")
 height1 = ttk.Combobox(atm_inputs, width=15, textvariable=height_list)
-height1['values'] = (100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650,
-                     700, 750, 800, 850, 900, 950, 1000)
+height1['values'] = [i for i in range(100, 1050, 50)]
 height1.grid(column=1, row=2)
 
 # Check buttons
@@ -369,12 +361,12 @@ result1.grid(row=0, column=0, sticky="nsew")
 # buttons
 Plot1 = ttk.Button(atm_outputs, text='Plot', width=10, command=data_plot1)
 Plot1.grid(row=10, column=0, sticky=N, padx=0, pady=0)
-save1 = ttk.Button(atm_outputs, text='save', width=10, command=atmo_save)
+save1 = ttk.Button(atm_outputs, text='Save', width=10, command=atmo_save)
 save1.grid(row=11, column=0, sticky=N, padx=0, pady=0)
 
 atmo_frame_2 = ttk.Frame(atm_outputs)
 atmo_frame_2.grid(row=10, column=1, ipadx=10, ipady=0, sticky="NSEW", rowspan=3, columnspan=3)
-result2 = Text(atmo_frame_2, wrap="none", width=82, height=19, font=("Times New Roman", 10), relief="solid")
+result2 = Text(atmo_frame_2, wrap="none", width=82, height=16, font=("Times New Roman", 10), relief="solid")
 vsb_atm2 = ttk.Scrollbar(atmo_frame_2, command=result2.yview, orient="vertical")
 result2.configure(yscrollcommand=vsb_atm2.set)
 atmo_frame_2.grid_rowconfigure(0, weight=1)
@@ -394,6 +386,7 @@ for row in range(6):
 
 # irradiance
 # ---------------------------------------------------------------------------------------------------------------------
+
 
 tab2.grid_columnconfigure(0, weight=1)
 tab2.grid_rowconfigure(0, weight=1)
@@ -446,22 +439,17 @@ irr_outputs.grid(column=0, row=1, columnspan=2, sticky="WE", padx=5, pady=0, ipa
 
 # months options button
 month = ttk.Combobox(irr_inputs, width=15, textvariable=month_list)
-month['values'] = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+month['values'] = [i for i in range(1, 13)]
 month.grid(column=1, row=1)
-
 # years options button
 year = ttk.Combobox(irr_inputs, width=15, textvariable=year_list)
-year['values'] = (1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-                  2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,
-                  2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030)
+year['values'] = [i for i in range(1996, 2031)]
 year.grid(column=2, row=1)
-
 # Labels
 date_irr = ttk.Label(irr_inputs, text='Date :         ')
 date_irr.grid(column=0, row=1)
 lat = ttk.Label(irr_inputs, text='Inclination :')
 lat.grid(column=0, row=2)
-
 # Inclination Entry
 lat_enter = ttk.Spinbox(irr_inputs, from_= 0, to_= 360, width = 11)
 lat_enter.grid(column=1, row=2, padx=0, pady=10)
@@ -473,12 +461,12 @@ result4 = ttk.Entry(irr_outputs, justify=LEFT)
 result4.grid(row=5, column=1, ipadx=0, ipady=0, columnspan=3, sticky="NSEW")
 Plot2 = ttk.Button(irr_outputs, text='Plot', width=10, command=irr_plot2)
 Plot2.grid(row=6, column=0, sticky=N, padx=0, pady=0)
-save2 = ttk.Button(irr_outputs, text='save', width=10, command=irr_save)
+save2 = ttk.Button(irr_outputs, text='Save', width=10, command=irr_save)
 save2.grid(row=7, column=0, sticky=N, padx=0, pady=0)
 
 irr_frame = ttk.Frame(irr_outputs)
 irr_frame.grid(row=6, column=1, ipadx=10, ipady=0, sticky="NSEW", rowspan=2, columnspan=3)
-result5 = Text(irr_frame, wrap="none", width=82, height=19, font=("Times New Roman", 10), relief="solid")
+result5 = Text(irr_frame, wrap="none", width=82, height=22, font=("Times New Roman", 10), relief="solid")
 vsb_irr = ttk.Scrollbar(irr_frame, command=result5.yview, orient="vertical")
 result5.configure(yscrollcommand=vsb_irr.set)
 irr_frame.grid_rowconfigure(0, weight=1)
@@ -498,6 +486,10 @@ for row in range(4):
 
 # orbital drag
 # ---------------------------------------------------------------------------------------------------------------------
+
+
+tab3.grid_columnconfigure(0, weight=1)
+tab3.grid_rowconfigure(0, weight=1)
 
 
 def lifetime():
@@ -542,74 +534,66 @@ def drag_save():
     except AttributeError:
         x = 1
 
-
-life_lbl = ttk.Label(tab3, text='-- Drag and Lifetime --', foreground="black", anchor=CENTER,
-                 font=("Times New Roman", 15))
-life_lbl.grid(column=0, row=0, columnspan=5, sticky="NSEW")
+drag_inputs = ttk.LabelFrame(tab3, text="inputs")
+drag_inputs.grid(column=0, row=0, columnspan=2, sticky="WE", padx=5, pady=0, ipadx=0, ipady=0)
+drag_outputs = ttk.LabelFrame(tab3, text="result")
+drag_outputs.grid(column=0, row=1, columnspan=2, sticky="WE", padx=5, pady=0, ipadx=0, ipady=0)
 
 # date
-life_date = ttk.Label(tab3, textvariable=date)
+life_date = ttk.Label(drag_inputs, textvariable=date)
 life_date.grid(column=0, row=1, padx=10, sticky="NSEW")
-
 # months options button
 month_list3 = IntVar(None)
-month_list3.set("Month")
-month3 = ttk.Combobox(tab3, width=15, textvariable=month_list3)
-month3['values'] = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+month_list3.set("month")
+month3 = ttk.Combobox(drag_inputs, width=14, textvariable=month_list3)
+month3['values'] = [i for i in range(1, 13)]
 month3.grid(column=1, row=1)
-
 # years options button
-year3 = ttk.Combobox(tab3, width=15, textvariable=year_list)
-year3['values'] = (1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-                   2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,
-                   2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030)
+year3 = ttk.Combobox(drag_inputs, width=14, textvariable=year_list)
+year3['values'] = [i for i in range(1996, 2031)]
 year3.grid(column=3, row=1)
 
 # labels
-life_sem_lbl = ttk.Label(tab3, text='Semi-major axis :').grid(column=0, row=2, padx=10, sticky=W)
-life_sem_enter = ttk.Entry(tab3, justify='center', width=17)
+life_sem_lbl = ttk.Label(drag_inputs, text='Semi-major axis :').grid(column=0, row=2, padx=10, sticky=W)
+life_sem_enter = ttk.Entry(drag_inputs, justify='center', width=17)
 life_sem_enter.grid(column=1, row=2)
-life_ecc_lbl = ttk.Label(tab3, text='Eccentricity :').grid(column=2, row=2, padx=10, sticky=W)
-life_ecc_enter = ttk.Entry(tab3, justify='center', width=17)
+life_ecc_lbl = ttk.Label(drag_inputs, text='Eccentricity :').grid(column=2, row=2, padx=10, sticky=W)
+life_ecc_enter = ttk.Entry(drag_inputs, justify='center', width=17)
 life_ecc_enter.grid(column=3, row=2)
-life_inc_lbl = ttk.Label(tab3, text='Inclination :').grid(column=0, row=3, padx=10, sticky=W)
-life_inc_enter = ttk.Entry(tab3, justify='center', width=17, state='disabled')
+life_inc_lbl = ttk.Label(drag_inputs, text='Inclination :').grid(column=0, row=3, padx=10, sticky=W)
+life_inc_enter = ttk.Entry(drag_inputs, justify='center', width=17, state='disabled')
 life_inc_enter.grid(column=1, row=3)
-life_mass_lbl = ttk.Label(tab3, text='Mass kg :').grid(column=2, row=3, padx=10, sticky=W)
-life_mass_enter = ttk.Entry(tab3, justify='center', width=17)
+life_mass_lbl = ttk.Label(drag_inputs, text='Mass kg :').grid(column=2, row=3, padx=10, sticky=W)
+life_mass_enter = ttk.Entry(drag_inputs, justify='center', width=17)
 life_mass_enter.grid(column=3, row=3)
-life_arp_lbl = ttk.Label(tab3, text='Argument Perigee :').grid(column=0, row=4, padx=10, sticky=W)
-life_arp_enter = ttk.Entry(tab3, justify='center', width=17, state='disabled')
+life_arp_lbl = ttk.Label(drag_inputs, text='Argument Perigee :').grid(column=0, row=4, padx=10, sticky=W)
+life_arp_enter = ttk.Entry(drag_inputs, justify='center', width=17, state='disabled')
 life_arp_enter.grid(column=1, row=4)
-life_area_lbl = ttk.Label(tab3, text='Area m^2 :').grid(column=2, row=4, padx=10, sticky=W)
-life_area_enter = ttk.Entry(tab3, justify='center', width=17)
+life_area_lbl = ttk.Label(drag_inputs, text='Area m^2 :').grid(column=2, row=4, padx=10, sticky=W)
+life_area_enter = ttk.Entry(drag_inputs, justify='center', width=17)
 life_area_enter.grid(column=3, row=4)
-life_true_lbl = ttk.Label(tab3, text='Treu Anomaly :').grid(column=0, row=5, padx=10, sticky=W)
-life_true_enter = ttk.Entry(tab3, justify='center', width=17)
+life_true_lbl = ttk.Label(drag_inputs, text='Treu Anomaly :').grid(column=0, row=5, padx=10, sticky=W)
+life_true_enter = ttk.Entry(drag_inputs, justify='center', width=17)
 life_true_enter.grid(column=1, row=5)
 
 # check
 semi_major_axis = IntVar()
-ttk.Checkbutton(tab3, text="Semi-major Axis km", variable=semi_major_axis).grid(column=1, row=7, sticky=NW)
+ttk.Checkbutton(drag_inputs, text="Semi-major Axis", variable=semi_major_axis, style="Switch.TCheckbutton").grid(column=1, row=6, sticky=NW)
 eccentricity_life = IntVar()
-ttk.Checkbutton(tab3, text="Eccentricity", variable=eccentricity_life).grid(column=1, row=8, sticky=NW)
+ttk.Checkbutton(drag_inputs, text="Eccentricity", variable=eccentricity_life, style="Switch.TCheckbutton").grid(column=1, row=7, sticky=NW, pady=5)
 atmo_drag = IntVar()
-ttk.Checkbutton(tab3, text="Drag", variable=atmo_drag).grid(column=3, row=7, sticky=NW)
+ttk.Checkbutton(drag_inputs, text="Drag", variable=atmo_drag, style="Switch.TCheckbutton").grid(column=3, row=6, sticky=NW)
 earth_oblate = IntVar()
-ttk.Checkbutton(tab3, text="Under Oblateness", state=DISABLED, variable=earth_oblate).grid(column=3, row=8, sticky=NW)
-
-drag_lbl = ttk.Label(tab3, text='note that the operation would take minutes or may be hours', foreground="gray", anchor=CENTER,)
-drag_lbl.grid(column=0, row=6, columnspan=6, sticky="NSEW")
+ttk.Checkbutton(drag_inputs, text="Under Oblateness", state=DISABLED, variable=earth_oblate, style="Switch.TCheckbutton").grid(column=3, row=7, sticky=NW, pady=5)
 
 # output
-life_result = ttk.Button(tab3, text='Result', width=10, command=lifetime)
+life_result = ttk.Button(drag_outputs, text='Result', width=10, command=lifetime)
 life_result.grid(row=9, column=0, sticky=N, padx=0, pady=0)
-life_save = ttk.Button(tab3, text='save', width=10, command=drag_save)
+life_save = ttk.Button(drag_outputs, text='Save', width=10, command=drag_save)
 life_save.grid(row=10, column=0, sticky=N, padx=0, pady=0)
-
-life_frame = ttk.Frame(tab3)
+life_frame = ttk.Frame(drag_outputs)
 life_frame.grid(row=9, column=1, ipadx=10, ipady=0, sticky="NSEW", rowspan=3, columnspan=3)
-orbitdrag = Text(life_frame, wrap="none", width=82, height=19, font=("Times New Roman", 10), relief="solid")
+orbitdrag = Text(life_frame, wrap="none", width=82, height=16, font=("Times New Roman", 10), relief="solid")
 vsb_life = ttk.Scrollbar(life_frame, command=orbitdrag.yview, orient="vertical")
 orbitdrag.configure(yscrollcommand=vsb_life.set)
 life_frame.grid_rowconfigure(0, weight=1)
@@ -617,14 +601,22 @@ life_frame.grid_columnconfigure(0, weight=1)
 vsb_life.grid(row=0, column=1, sticky="ns")
 orbitdrag.grid(row=0, column=0, sticky="nsew")
 
-tab3.rowconfigure(0, weight=1)
-for col in range(5):
-    tab3.columnconfigure(col, weight=1)
-tab3.rowconfigure(9, weight=1)
+for col in range(4):
+    drag_inputs.columnconfigure(col, weight=1)
+for col in range(4):
+    drag_outputs.columnconfigure(col, weight=1)
+for row in range(6):
+    drag_inputs.rowconfigure(row, weight=1)
+for row in range(4):
+    drag_outputs.rowconfigure(row, weight=1)
 
 
 # cme activity
 # ---------------------------------------------------------------------------------------------------------------------
+
+
+tab4.grid_columnconfigure(0, weight=1)
+tab4.grid_rowconfigure(0, weight=1)
 
 
 def cme_result():
@@ -693,64 +685,52 @@ def cme_save():
         x = 1
 
 
-cme_lbl = ttk.Label(tab4, text='-- Regression for Solar Activity (CME) --', foreground="black", anchor=CENTER,
-                font=("Times New Roman", 15))
-cme_lbl.grid(column=0, row=0, columnspan=5, sticky="NSEW")
+cme_inputs = ttk.LabelFrame(tab4, text="inputs")
+cme_inputs.grid(column=0, row=0, columnspan=2, sticky="WE", padx=5, pady=0, ipadx=0, ipady=0)
+cme_outputs = ttk.LabelFrame(tab4, text="result")
+cme_outputs.grid(column=0, row=1, columnspan=2, sticky="WE", padx=5, pady=0, ipadx=0, ipady=0)
 
 # date label
-cme_date = ttk.Label(tab4, textvariable=date)
+cme_date = ttk.Label(cme_inputs, textvariable=date)
 cme_date.grid(column=0, row=1)
-
-
+# days
 day_list = IntVar()
-day_list.set("days")
-day = ttk.Combobox(tab4, width=15, textvariable=day_list)
-day['values'] = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-                 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31)
+day_list.set("day")
+day = ttk.Combobox(cme_inputs, width=15, textvariable=day_list)
+day['values'] = [i for i in range(1, 32)]
 day.grid(column=1, row=1)
-
 # months options button
 month_list4 = IntVar(None)
-month_list4.set("Month")
-month4 = ttk.Combobox(tab4, width=15, textvariable=month_list4)
-month4['values'] = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+month_list4.set("month")
+month4 = ttk.Combobox(cme_inputs, width=15, textvariable=month_list4)
+month4['values'] = [i for i in range(1, 13)]
 month4.grid(column=2, row=1)
-
 # years options button
-year4 = ttk.Combobox(tab4, width=15, textvariable=year_list)
-year4['values'] = (1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-                   2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,
-                   2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030)
+year4 = ttk.Combobox(cme_inputs, width=15, textvariable=year_list)
+year4['values'] = [i for i in range(1996, 2031)]
 year4.grid(column=3, row=1)
-
-
-cme_prop = ttk.Label(tab4, text='-- CME property --', foreground="black", anchor=CENTER,
-                 font=("Times New Roman", 11))
-cme_prop.grid(column=0, row=2, columnspan=5)
-
 # check box
 Central_PA = IntVar()
-ttk.Checkbutton(tab4, text="Central PA", variable=Central_PA).grid(column=2, row=3, sticky=N)
+ttk.Checkbutton(cme_inputs, text="Central PA", variable=Central_PA, style="Switch.TCheckbutton").grid(column=2, row=3)
 Linear_Speed = IntVar()
-ttk.Checkbutton(tab4, text="Linear_Speed", variable=Linear_Speed).grid(column=1, row=3, sticky=NW)
+ttk.Checkbutton(cme_inputs, text="Linear_Speed", variable=Linear_Speed, style="Switch.TCheckbutton").grid(column=1, row=3)
 MPA = IntVar()
-ttk.Checkbutton(tab4, text="Mass          ", variable=MPA).grid(column=2, row=4, sticky=N)
+ttk.Checkbutton(cme_inputs, text="Mass         ", variable=MPA, style="Switch.TCheckbutton").grid(column=2, row=4, pady=5)
 Width = IntVar()
-ttk.Checkbutton(tab4, text="Width         ", variable=Width).grid(column=3, row=3, sticky=NE)
+ttk.Checkbutton(cme_inputs, text="Width         ", variable=Width, style="Switch.TCheckbutton").grid(column=3, row=3)
 
 # output
-result9 = ttk.Button(tab4, text='Result', width=10, command=cme_result)
+result9 = ttk.Button(cme_outputs, text='Result', width=10, command=cme_result)
 result9.grid(row=5, column=0, sticky=N, padx=0, pady=0)
-result10 = ttk.Entry(tab4, justify=LEFT)
+result10 = ttk.Entry(cme_outputs, justify=LEFT)
 result10.grid(row=5, column=1, ipadx=0, ipady=0, columnspan=3, sticky="NSEW")
-Plot4 = ttk.Button(tab4, text='Plot', width=10, command=cme_plot1)
+Plot4 = ttk.Button(cme_outputs, text='Plot', width=10, command=cme_plot1)
 Plot4.grid(row=6, column=0, sticky=N, padx=0, pady=0)
-save4 = ttk.Button(tab4, text='save', width=10, command=cme_save)
+save4 = ttk.Button(cme_outputs, text='Save', width=10, command=cme_save)
 save4.grid(row=7, column=0, sticky=N, padx=0, pady=0)
-
-cme_frame = ttk.Frame(tab4)
+cme_frame = ttk.Frame(cme_outputs)
 cme_frame.grid(row=6, column=1, ipadx=10, ipady=0, sticky="NSEW", rowspan=3, columnspan=3)
-result11 = Text(cme_frame, wrap="none", width=82, height=19, font=("Times New Roman", 10), relief="solid")
+result11 = Text(cme_frame, wrap="none", width=82, height=21, font=("Times New Roman", 10), relief="solid")
 vsb_cme = ttk.Scrollbar(cme_frame, command=result11.yview, orient="vertical")
 result11.configure(yscrollcommand=vsb_cme.set)
 cme_frame.grid_rowconfigure(0, weight=1)
@@ -758,18 +738,21 @@ cme_frame.grid_columnconfigure(0, weight=1)
 vsb_cme.grid(row=0, column=1, sticky="ns")
 result11.grid(row=0, column=0, sticky="nsew")
 
-#result11 = scrolledtext.ScrolledText(tab4, width=82, height=19, font=("Times New Roman", 10), relief="solid")
-#result11.grid(row=6, column=1, ipadx=9, ipady=0, sticky="NSEW", rowspan=3, columnspan=3)
-
-tab4.rowconfigure(0, weight=1)
-for col in range(5):
-    tab4.columnconfigure(col, weight=1)
-tab4.rowconfigure(6, weight=1)
+for col in range(4):
+    cme_inputs.columnconfigure(col, weight=1)
+for col in range(4):
+    cme_outputs.columnconfigure(col, weight=1)
+for row in range(4):
+    cme_inputs.rowconfigure(row, weight=1)
+for row in range(4):
+    cme_outputs.rowconfigure(row, weight=1)
 
 
 # debris
 # ---------------------------------------------------------------------------------------------------------------------
 
+tab5.grid_columnconfigure(0, weight=1)
+tab5.grid_rowconfigure(0, weight=1)
 
 def deb_plotter():
     try:
@@ -805,85 +788,78 @@ def deb_save():
         x = 1
 
 
-debris_lbl = ttk.Label(tab5, text='-- Debris Hazards --', foreground="black", anchor=CENTER,
-                   font=("Times New Roman", 15))
-debris_lbl.grid(column=0, row=0, columnspan=5, sticky="NSEW")
+deb_inputs = ttk.LabelFrame(tab5, text="inputs")
+deb_inputs.grid(column=0, row=0, columnspan=2, sticky="WE", padx=5, pady=0, ipadx=0, ipady=0)
+deb_outputs = ttk.LabelFrame(tab5, text="result")
+deb_outputs.grid(column=0, row=1, columnspan=2, sticky="WE", padx=5, pady=0, ipadx=0, ipady=0)
+
 # a, ecc, inc, raan, argp, nu, yy, mm, dd, hh, mn, ss
 # date
-deb_date = ttk.Label(tab5, textvariable=date)
+deb_date = ttk.Label(deb_inputs, textvariable=date)
 deb_date.grid(column=0, row=1, padx=10, sticky=W)
-
 # day
 day_list0 = IntVar()
-day_list0.set("days")
-day5 = ttk.Combobox(tab5, width=15, textvariable=day_list0)
-day5['values'] = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-                  16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31)
+day_list0.set("day")
+day5 = ttk.Combobox(deb_inputs, width=14, textvariable=day_list0)
+day5['values'] = [i for i in range(1, 32)]
 day5.grid(column=1, row=1)
-
 # months options button
 month_list5 = IntVar(None)
-month_list5.set("Month")
-month5 = ttk.Combobox(tab5, width=15, textvariable=month_list5)
-month5['values'] = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+month_list5.set("month")
+month5 = ttk.Combobox(deb_inputs, width=14, textvariable=month_list5)
+month5['values'] = [i for i in range(1, 13)]
 month5.grid(column=2, row=1)
-
 # years options button
-year5 = ttk.Entry(tab5, justify='center', width=17)
-year5.insert(0, 'years')
-year5.grid(column=3, row=1)
+year5 = IntVar(None)
+year5.set("year")
+year5_ = ttk.Combobox(deb_inputs, width=14, textvariable=year5)
+year5_['values'] = [i for i in range(1996, 2031)]
+year5_.grid(column=3, row=1)
 # hours options button
 hours_0 = IntVar(None)
 hours_0.set("hours")
-hours0 = ttk.Combobox(tab5, width=15, textvariable=hours_0)
-hours0['values'] = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23)
+hours0 = ttk.Combobox(deb_inputs, width=14, textvariable=hours_0)
+hours0['values'] = [i for i in range(1, 24)]
 hours0.grid(column=1, row=2)
 # hours options button
 minuts_0 = IntVar(None)
 minuts_0.set("minutes")
-minuts0 = ttk.Combobox(tab5, width=15, textvariable=minuts_0)
-minuts0['values'] = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
-                     27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
-                     51, 52, 53, 54, 55, 56, 57, 58, 59)
+minuts0 = ttk.Combobox(deb_inputs, width=14, textvariable=minuts_0)
+minuts0['values'] = [i for i in range(1, 60)]
 minuts0.grid(column=2, row=2)
 # hours options button
 seconds_0 = IntVar(None)
 seconds_0.set("seconds")
-seconds0 = ttk.Combobox(tab5, width=15, textvariable=seconds_0)
-seconds0['values'] = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
-                      27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
-                      51, 52, 53, 54, 55, 56, 57, 58, 59)
+seconds0 = ttk.Combobox(deb_inputs, width=14, textvariable=seconds_0)
+seconds0['values'] = [i for i in range(1, 60)]
 seconds0.grid(column=3, row=2)
 # sa, ecc, inc, raan, argp, nu, yy, mm, dd, p, aa, m
 # labels
-deb_sem_lbl = ttk.Label(tab5, text='Semi-major axis :    ').grid(column=0, row=3, padx=10, sticky=W)
-deb_sem_enter = ttk.Entry(tab5, justify='center', width=17)
+deb_sem_lbl = ttk.Label(deb_inputs, text='Semi-major axis :    ').grid(column=0, row=3, padx=10, sticky=W)
+deb_sem_enter = ttk.Entry(deb_inputs, justify='center', width=17)
 deb_sem_enter.grid(column=1, row=3)
-deb_ecc_lbl = ttk.Label(tab5, text='Eccentricity :       ').grid(column=2, row=3, padx=10, sticky=W)
-deb_ecc_enter = ttk.Entry(tab5, justify='center', width=17)
+deb_ecc_lbl = ttk.Label(deb_inputs, text='Eccentricity :       ').grid(column=2, row=3, padx=10, sticky=W)
+deb_ecc_enter = ttk.Entry(deb_inputs, justify='center', width=17)
 deb_ecc_enter.grid(column=3, row=3)
-deb_inc_lbl = ttk.Label(tab5, text='Inclination :        ').grid(column=0, row=4, padx=10, sticky=W)
-deb_inc_enter = ttk.Entry(tab5, justify='center', width=17)
+deb_inc_lbl = ttk.Label(deb_inputs, text='Inclination :        ').grid(column=0, row=4, padx=10, sticky=W)
+deb_inc_enter = ttk.Entry(deb_inputs, justify='center', width=17)
 deb_inc_enter.grid(column=1, row=4)
-deb_raa_lbl = ttk.Label(tab5, text='Right Ascension :    ').grid(column=2, row=4, padx=10, sticky=W)
-deb_raa_enter = ttk.Entry(tab5, justify='center', width=17)
+deb_raa_lbl = ttk.Label(deb_inputs, text='Right Ascension :    ').grid(column=2, row=4, padx=10, sticky=W)
+deb_raa_enter = ttk.Entry(deb_inputs, justify='center', width=17)
 deb_raa_enter.grid(column=3, row=4)
-deb_arp_lbl = ttk.Label(tab5, text='Argument Perigee :').grid(column=0, row=5, padx=10, sticky=W)
-deb_arp_enter = ttk.Entry(tab5, justify='center', width=17)
+deb_arp_lbl = ttk.Label(deb_inputs, text='Argument Perigee :').grid(column=0, row=5, padx=10, sticky=W)
+deb_arp_enter = ttk.Entry(deb_inputs, justify='center', width=17)
 deb_arp_enter.grid(column=1, row=5)
-deb_tru_lbl = ttk.Label(tab5, text='True Anomaly :       ').grid(column=2, row=5, padx=10, sticky=W)
-deb_tru_enter = ttk.Entry(tab5, justify='center', width=17)
+deb_tru_lbl = ttk.Label(deb_inputs, text='True Anomaly :       ').grid(column=2, row=5, padx=10, sticky=W)
+deb_tru_enter = ttk.Entry(deb_inputs, justify='center', width=17)
 deb_tru_enter.grid(column=3, row=5)
-#
-deb_lbl = ttk.Label(tab5, text='  ', foreground="black")
-deb_lbl.grid(column=0, row=6, columnspan=5, sticky="NSEW")
-# result
-deb_visi_plot = ttk.Button(tab5, text='Plot', width=10, command=deb_plotter)
-deb_visi_plot.grid(row=7, column=0, sticky=N, padx=0, pady=0)
-deb_visi_save = ttk.Button(tab5, text='save', width=10, command=deb_save)
-deb_visi_save.grid(row=8, column=0, sticky=N, padx=0, pady=0)
 
-dep_frame = ttk.Frame(tab5)
+# result
+deb_visi_plot = ttk.Button(deb_outputs, text='Plot', width=10, command=deb_plotter)
+deb_visi_plot.grid(row=7, column=0, sticky=N, padx=0, pady=0)
+deb_visi_save = ttk.Button(deb_outputs, text='Save', width=10, command=deb_save)
+deb_visi_save.grid(row=8, column=0, sticky=N, padx=0, pady=0)
+dep_frame = ttk.Frame(deb_outputs)
 dep_frame.grid(row=7, column=1, ipadx=10, ipady=0, sticky="NSEW", rowspan=3, columnspan=3)
 deb_visi_resu = Text(dep_frame, wrap="none", width=82, height=19, font=("Times New Roman", 10), relief="solid")
 vsb_dep = ttk.Scrollbar(dep_frame, command=deb_visi_resu.yview, orient="vertical")
@@ -893,18 +869,22 @@ dep_frame.grid_columnconfigure(0, weight=1)
 vsb_dep.grid(row=0, column=1, sticky="ns")
 deb_visi_resu.grid(row=0, column=0, sticky="nsew")
 
-#deb_visi_resu = scrolledtext.ScrolledText(tab5, width=82, height=19, font=("Times New Roman", 10), relief="solid")
-#deb_visi_resu.grid(row=7, column=1, ipadx=9, ipady=0, sticky="NSEW", rowspan=3, columnspan=3)
-
-
-tab5.rowconfigure(0, weight=1)
-for col in range(5):
-    tab5.columnconfigure(col, weight=1)
-tab5.rowconfigure(7, weight=1)
+for col in range(4):
+    deb_inputs.columnconfigure(col, weight=1)
+for col in range(4):
+    deb_outputs.columnconfigure(col, weight=1)
+for row in range(5):
+    deb_inputs.rowconfigure(row, weight=1)
+for row in range(4):
+    deb_outputs.rowconfigure(row, weight=1)
 
 
 # orbital visiualization
 # ---------------------------------------------------------------------------------------------------------------------
+
+
+tab6.grid_columnconfigure(0, weight=1)
+tab6.grid_rowconfigure(0, weight=1)
 
 
 def orb_plotter():
@@ -944,96 +924,88 @@ def visi_save():
         x = 1
 
 
-visi_lbl = ttk.Label(tab6, text='-- Orbital Visiualization --', foreground="black", anchor=CENTER,
-                 font=("Times New Roman", 15))
-visi_lbl.grid(column=0, row=0, columnspan=5, sticky="NSEW")
+vis_inputs = ttk.LabelFrame(tab6, text="inputs")
+vis_inputs.grid(column=0, row=0, columnspan=2, sticky="WE", padx=5, pady=0, ipadx=0, ipady=0)
+vis_outputs = ttk.LabelFrame(tab6, text="result")
+vis_outputs.grid(column=0, row=1, columnspan=2, sticky="WE", padx=5, pady=0, ipadx=0, ipady=0)
 
 # date
-visi_date = ttk.Label(tab6, textvariable=date)
+visi_date = ttk.Label(vis_inputs, textvariable=date)
 visi_date.grid(column=0, row=1, padx=10, sticky=W)
-
 # day
 day_list1 = IntVar()
-day_list1.set("days")
-day6 = ttk.Combobox(tab6, width=15, textvariable=day_list1)
-day6['values'] = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-                  16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31)
+day_list1.set("day")
+day6 = ttk.Combobox(vis_inputs, width=14, textvariable=day_list1)
+day6['values'] = [i for i in range(1, 32)]
 day6.grid(column=1, row=1)
-
 # months options button
 month_list6 = IntVar(None)
-month_list6.set("Month")
-month6 = ttk.Combobox(tab6, width=15, textvariable=month_list6)
-month6['values'] = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+month_list6.set("month")
+month6 = ttk.Combobox(vis_inputs, width=14, textvariable=month_list6)
+month6['values'] = [i for i in range(1, 13)]
 month6.grid(column=2, row=1)
-
 # years options button
-year6 = ttk.Entry(tab6, justify='center', width=17)
-year6.insert(0, 'years')
-year6.grid(column=3, row=1)
+year6 = IntVar(None)
+year6.set("year")
+year6_ = ttk.Combobox(vis_inputs, width=14, textvariable=year6)
+year6_['values'] = [i for i in range(1996, 2031)]
+year6_.grid(column=3, row=1)
 # hours options button
 hours = IntVar(None)
 hours.set("hours")
-hours1 = ttk.Combobox(tab6, width=15, textvariable=hours)
-hours1['values'] = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23)
+hours1 = ttk.Combobox(vis_inputs, width=14, textvariable=hours)
+hours1['values'] = [i for i in range(1, 24)]
 hours1.grid(column=1, row=2)
 # hours options button
 minuts = IntVar(None)
 minuts.set("minutes")
-minuts1 = ttk.Combobox(tab6, width=15, textvariable=minuts)
-minuts1['values'] = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
-                     27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
-                     51, 52, 53, 54, 55, 56, 57, 58, 59)
+minuts1 = ttk.Combobox(vis_inputs, width=14, textvariable=minuts)
+minuts1['values'] = [i for i in range(1, 60)]
 minuts1.grid(column=2, row=2)
 # hours options button
 seconds = IntVar(None)
 seconds.set("seconds")
-seconds1 = ttk.Combobox(tab6, width=15, textvariable=seconds)
-seconds1['values'] = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
-                      27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
-                      51, 52, 53, 54, 55, 56, 57, 58, 59)
+seconds1 = ttk.Combobox(vis_inputs, width=14, textvariable=seconds)
+seconds1['values'] = [i for i in range(1, 60)]
 seconds1.grid(column=3, row=2)
 # sa, ecc, inc, raan, argp, nu, yy, mm, dd, p, aa, m
 # labels
-sem_lbl = ttk.Label(tab6, text='Semi-major axis :    ').grid(column=0, row=3, padx=10, sticky=W)
-sem_enter = ttk.Entry(tab6, justify='center', width=17)
+sem_lbl = ttk.Label(vis_inputs, text='Semi-major axis :    ').grid(column=0, row=3, padx=10, sticky=W)
+sem_enter = ttk.Entry(vis_inputs, justify='center', width=17)
 sem_enter.grid(column=1, row=3)
-ecc_lbl = ttk.Label(tab6, text='Eccentricity :       ').grid(column=2, row=3, padx=10, sticky=W)
-ecc_enter = ttk.Entry(tab6, justify='center', width=17)
+ecc_lbl = ttk.Label(vis_inputs, text='Eccentricity :       ').grid(column=2, row=3, padx=10, sticky=W)
+ecc_enter = ttk.Entry(vis_inputs, justify='center', width=17)
 ecc_enter.grid(column=3, row=3)
-inc_lbl = ttk.Label(tab6, text='Inclination :        ').grid(column=0, row=4, padx=10, sticky=W)
-inc_enter = ttk.Entry(tab6, justify='center', width=17)
+inc_lbl = ttk.Label(vis_inputs, text='Inclination :        ').grid(column=0, row=4, padx=10, sticky=W)
+inc_enter = ttk.Entry(vis_inputs, justify='center', width=17)
 inc_enter.grid(column=1, row=4)
-raa_lbl = ttk.Label(tab6, text='Right Ascension :    ').grid(column=2, row=4, padx=10, sticky=W)
-raa_enter = ttk.Entry(tab6, justify='center', width=17)
+raa_lbl = ttk.Label(vis_inputs, text='Right Ascension :    ').grid(column=2, row=4, padx=10, sticky=W)
+raa_enter = ttk.Entry(vis_inputs, justify='center', width=17)
 raa_enter.grid(column=3, row=4)
-arp_lbl = ttk.Label(tab6, text='Argument Perigee :').grid(column=0, row=5, padx=10, sticky=W)
-arp_enter = ttk.Entry(tab6, justify='center', width=17)
+arp_lbl = ttk.Label(vis_inputs, text='Argument Perigee :').grid(column=0, row=5, padx=10, sticky=W)
+arp_enter = ttk.Entry(vis_inputs, justify='center', width=17)
 arp_enter.grid(column=1, row=5)
-tru_lbl = ttk.Label(tab6, text='True Anomaly :       ').grid(column=2, row=5, padx=10, sticky=W)
-tru_enter = ttk.Entry(tab6, justify='center', width=17)
+tru_lbl = ttk.Label(vis_inputs, text='True Anomaly :       ').grid(column=2, row=5, padx=10, sticky=W)
+tru_enter = ttk.Entry(vis_inputs, justify='center', width=17)
 tru_enter.grid(column=3, row=5)
-prd_lbl = ttk.Label(tab6, text='Number of Tours :    ').grid(column=0, row=6, padx=10, sticky=W)
-prd_enter = ttk.Entry(tab6, justify='center', width=17)
+prd_lbl = ttk.Label(vis_inputs, text='Number of Tours :    ').grid(column=0, row=6, padx=10, sticky=W)
+prd_enter = ttk.Entry(vis_inputs, justify='center', width=17)
 prd_enter.grid(column=1, row=6)
-mas_lbl = ttk.Label(tab6, text='Mass :               ').grid(column=2, row=6, padx=10, sticky=W)
-mas_enter = ttk.Entry(tab6, justify='center', width=17)
+mas_lbl = ttk.Label(vis_inputs, text='Mass :               ').grid(column=2, row=6, padx=10, sticky=W)
+mas_enter = ttk.Entry(vis_inputs, justify='center', width=17)
 mas_enter.grid(column=3, row=6)
-are_lbl = ttk.Label(tab6, text='Area :               ').grid(column=0, row=7, padx=10, sticky=W)
-are_enter = ttk.Entry(tab6, justify='center', width=17)
+are_lbl = ttk.Label(vis_inputs, text='Area :               ').grid(column=0, row=7, padx=10, sticky=W)
+are_enter = ttk.Entry(vis_inputs, justify='center', width=17)
 are_enter.grid(column=1, row=7)
-#
-visi_lbl = ttk.Label(tab6, text='         ', foreground="black", font=("Times New Roman", 15))
-visi_lbl.grid(column=0, row=8, columnspan=5, sticky="NSEW")
-# result
-visi_plot = ttk.Button(tab6, text='Plot', width=10, command=orb_plotter)
-visi_plot.grid(row=9, column=0, sticky=N, padx=0, pady=0)
-visi_save = ttk.Button(tab6, text='save', width=10, command=visi_save)
-visi_save.grid(row=10, column=0, sticky=N, padx=0, pady=0)
 
-visio_frame = ttk.Frame(tab6)
+# result
+visi_plot = ttk.Button(vis_outputs, text='Plot', width=10, command=orb_plotter)
+visi_plot.grid(row=9, column=0, sticky=N, padx=0, pady=0)
+visi_save = ttk.Button(vis_outputs, text='Save', width=10, command=visi_save)
+visi_save.grid(row=10, column=0, sticky=N, padx=0, pady=0)
+visio_frame = ttk.Frame(vis_outputs)
 visio_frame.grid(row=9, column=1, ipadx=10, ipady=0, sticky="NSEW", rowspan=3, columnspan=3)
-visi_resu = Text(visio_frame, wrap="none", width=82, height=19, font=("Times New Roman", 10), relief="solid")
+visi_resu = Text(visio_frame, wrap="none", width=82, height=16, font=("Times New Roman", 10), relief="solid")
 vsb_visio = ttk.Scrollbar(visio_frame, command=visi_resu.yview, orient="vertical")
 visi_resu.configure(yscrollcommand=vsb_visio.set)
 visio_frame.grid_rowconfigure(0, weight=1)
@@ -1041,18 +1013,19 @@ visio_frame.grid_columnconfigure(0, weight=1)
 vsb_visio.grid(row=0, column=1, sticky="ns")
 visi_resu.grid(row=0, column=0, sticky="nsew")
 
-#visi_resu = scrolledtext.ScrolledText(tab6, width=82, height=19, font=("Times New Roman", 10), relief="solid")
-#visi_resu.grid(row=9, column=1, ipadx=9, ipady=0, sticky="NSEW", rowspan=3, columnspan=3)
-
-
-tab6.rowconfigure(0, weight=1)
-for col in range(5):
-    tab6.columnconfigure(col, weight=1)
-tab6.rowconfigure(9, weight=1)
+for col in range(4):
+    vis_inputs.columnconfigure(col, weight=1)
+for col in range(4):
+    vis_outputs.columnconfigure(col, weight=1)
+for row in range(7):
+    vis_inputs.rowconfigure(row, weight=1)
+for row in range(4):
+    vis_outputs.rowconfigure(row, weight=1)
 
 
 # window pack
 # ---------------------------------------------------------------------------------------------------------------------
+
 
 while True:
     window.wm_minsize(1100, 600)
