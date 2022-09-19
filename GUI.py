@@ -2,7 +2,7 @@ from tkinter.filedialog import asksaveasfile
 from functions import *
 #from tkinter import *       #
 #from tkinter import ttk     #
-#from ttkthemes import ThemedTk
+from ttkthemes import ThemedTk
 import sys
 
 
