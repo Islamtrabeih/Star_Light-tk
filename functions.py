@@ -1,59 +1,6 @@
-from tkinter import *
-from tkinter import ttk
-import openpyxl as xl
 import pandas as pd
 import plotly.express as px
-import astropy.time
-import dateutil.parser
-from astropy import units
-from astropy import time
-from poliastro.earth import EarthSatellite
-from poliastro import spacecraft
-from poliastro.earth.plotting import GroundtrackPlotter
-from poliastro.twobody import Orbit
-from poliastro.bodies import Earth
-from poliastro.util import time_range
-from plotly.offline import download_plotlyjs, init_notebook_mode, plot
-from plotly.graph_objs import *
-from math import *
-import sys
-import os
-
-
-# main functions
-# ----------------------------------------------------------------------------------------------------------------------
-
-
-def about():
-    about_win = Toplevel(height=400, width=567)
-    about_win.minsize(height=400, width=567)
-    about_win.resizable(False, False)
-
-    columns1 = ('#1', '#2', '#3')
-    tree1 = ttk.Treeview(about_win, columns=columns1, show='headings')
-    tree1.heading('#1', text='Students')
-    tree1.heading('#2', text='Sections')
-    tree1.heading('#3', text='Email')
-    contacts1 = [('Islam Reda Ahmed', 'Astronomy', 'islamtrabeih.me@gmail.com'), ('Rahma Ashraf Khalil', 'Physics', 'RahmaAshraf64@gmail.com')]
-    for contact in contacts1:
-        tree1.insert('', END, values=contact)
-    tree1.pack(side=BOTTOM, fill='x')
-
-    data1 = StringVar()
-    data1.set("Low Earth Orbit Program \nBy: Star_Light Team 2021")
-    label_Dir = Message(about_win, textvariable=data1, width=1000)
-    lst2 = ('Times New Roman', 13)
-    label_Dir.config(font=lst2)
-    label_Dir.pack(side=BOTTOM, fill='both')
-
-
-def new():
-    python = sys.executable
-    os.execl(python, python, *sys.argv)
-
-
-def help_index():
-    os.system('information.pdf')
+import math, sys, os
 
 
 # main functions
