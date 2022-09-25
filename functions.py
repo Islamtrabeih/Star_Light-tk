@@ -1,86 +1,55 @@
 import pandas as pd
 import plotly.express as px
 import math, sys, os
-
+from datetime import datetime
+from smoothing import *
 
 # main functions
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-def data_sheets(height0, checkbox, yy, mm, xx):
-    if height0 == 100 and checkbox:
-        at = xl.load_workbook('data/exponential_forecast_100km.xlsx')
-    if height0 == 150 and checkbox:
-        at = xl.load_workbook('data/exponential_forecast_150km.xlsx')
-    if height0 == 200 and checkbox:
-        at = xl.load_workbook('data/exponential_forecast_200km.xlsx')
-    if height0 == 250 and checkbox:
-        at = xl.load_workbook('data/exponential_forecast_250km.xlsx')
-    if height0 == 300 and checkbox:
-        at = xl.load_workbook('data/exponential_forecast_300km.xlsx')
-    if height0 == 350 and checkbox:
-        at = xl.load_workbook('data/exponential_forecast_350km.xlsx')
-    if height0 == 400 and checkbox:
-        at = xl.load_workbook('data/exponential_forecast_400km.xlsx')
-    if height0 == 450 and checkbox:
-        at = xl.load_workbook('data/exponential_forecast_450km.xlsx')
-    if height0 == 500 and checkbox:
-        at = xl.load_workbook('data/exponential_forecast_500km.xlsx')
-    if height0 == 550 and checkbox:
-        at = xl.load_workbook('data/exponential_forecast_550km.xlsx')
-    if height0 == 600 and checkbox:
-        at = xl.load_workbook('data/exponential_forecast_600km.xlsx')
-    if height0 == 650 and checkbox:
-        at = xl.load_workbook('data/exponential_forecast_650km.xlsx')
-    if height0 == 700 and checkbox:
-        at = xl.load_workbook('data/exponential_forecast_700km.xlsx')
-    if height0 == 750 and checkbox:
-        at = xl.load_workbook('data/exponential_forecast_750km.xlsx')
-    if height0 == 800 and checkbox:
-        at = xl.load_workbook('data/exponential_forecast_800km.xlsx')
-    if height0 == 850 and checkbox:
-        at = xl.load_workbook('data/exponential_forecast_850km.xlsx')
-    if height0 == 900 and checkbox:
-        at = xl.load_workbook('data/exponential_forecast_900km.xlsx')
-    if height0 == 950 and checkbox:
-        at = xl.load_workbook('data/exponential_forecast_950km.xlsx')
-    if height0 == 1000 and checkbox:
-        at = xl.load_workbook('data/exponential_forecast_1000km.xlsx')
-    xx = str(xx)
-    sheet = at[xx]
+def data_sheets(height, checkbox, yy, mm, xx, season, itr):
+    prop = ["Argon", "Density", "Temperature", "Atomic Oxygen", "Oxygen", "Atomic Nitrogen", "Nitogen", "Helium", "Hydrogen"]
+    at = pd.read_csv(f'data/{xx}.csv', header = None)
+    x = [[], []]
     yy, mm = int(yy), int(mm)
     rr = (yy - 1996) * 12 + mm + 1
-    cell0 = sheet.cell(rr, 2)
-    cell1 = sheet.cell(rr, 1)
-    until_da = cell1.value
-    data_value = cell0.value
-    before_after = f"from 2020 to {until_da}"
-    x = []
-    if rr > 297:
-        st = 297
-    else:
-        st = 2
-    for row in sheet[f'B{st}':f'B{rr}']:
-        for cell in row:
-            y = cell.value
-            x.append(y)
-    maximum = max(x)
-    for row in sheet[f'B{st}':f'B{rr}']:
-        for cell in row:
-            if cell.value == maximum:
-                dt = sheet.cell(row=cell.row, column=1).value
-    return data_value, x, maximum, dt, before_after
+    if rr < at.index[-1]:                                                     # append data and date to list x
+        for i in range(1, rr, 1):
+            x[0].append(datetime.strptime(at.loc[i, 0], "%d/%m/%Y"))
+            x[1].append(float(at.loc[i, height/50 - 1]))
+    elif rr > at.index[-1]:
+        for i in range(1, at.index[-1], 1):
+            x[0].append(datetime.strptime(at.loc[i, 0], "%d/%m/%Y"))
+            x[1].append(float(at.loc[i, height/50 - 1]))
+        a = parameters(x[1], season, int(itr), rr - at.index[-1])             # predict x and append values
+        x[1] = a[4]
+        for i in range(len(a[3])):                                            # appending the new dates
+            last_date = x[0][-1]
+            last_year = last_date.year
+            last_month = last_date.month
+            if last_month == 12:
+                last_year += 1
+                last_month = 0
+            date = datetime(last_year, last_month + 1, 1)
+            x[0].append(date)
+    until_da = x[0][rr-2]
+    data_value = x[1][rr-2]
+    before_after = f"between 2020 and {until_da}"
+    maximum = max(x[1])
+    maximum_d = x[0][x[1].index(maximum)]
+    return data_value, x[1], maximum, maximum_d, before_after, x[0]
 
 
-def cell_atmo_info(height0, checkbox, yy, mm, xx):
-    variable = data_sheets(height0, checkbox, yy, mm, xx)
-    if xx == 'density':
+def cell_atmo_info(height, checkbox, yy, mm, xx):
+    variable = data_sheets(height, checkbox, yy, mm, xx, 144, 10)
+    if xx == 'Density':
         zz = 'g/cm^3'
-    if xx == 'temperature':
+    if xx == 'Temperature':
         zz = 'kelvin'
-    if xx == 'O_atoms' or xx == 'N_atoms' or xx == 'Ar_atoms' or xx == 'He_atoms' or xx == 'H_atoms':
+    if xx == "Atomic Oxygen" or xx == "Atomic Nitrogen" or xx == "Argon" or xx == "Helium" or xx == "Hydrogen":
         zz = 'atom/cm^3'
-    if xx == 'O2_molecules' or xx == 'N2_molecules':
+    if xx == "Oxygen" or xx == "Nitogen":
         zz = 'molecule/cm^3'
     flight_info = f"The {xx} at {yy}-{mm} = {variable[0]} {zz} \n" \
                   f"The Maximum {xx} {variable[4]} = {variable[2]} {zz} \n" \
@@ -90,79 +59,60 @@ def cell_atmo_info(height0, checkbox, yy, mm, xx):
     return flight_info
 
 
-def data_plot(height0, checkbox, yy, mm, xx):
-    if height0 == 100 and checkbox:
-        at, title = 'data/exponential_forecast_100km.xlsx', "100km Height Plot"
-    if height0 == 150 and checkbox:
-        at, title = 'data/exponential_forecast_150km.xlsx', "150km Height Plot"
-    if height0 == 200 and checkbox:
-        at, title = 'data/exponential_forecast_200km.xlsx', "200km Height Plot"
-    if height0 == 250 and checkbox:
-        at, title = 'data/exponential_forecast_250km.xlsx', "250km Height Plot"
-    if height0 == 300 and checkbox:
-        at, title = 'data/exponential_forecast_300km.xlsx', "300km Height Plot"
-    if height0 == 350 and checkbox:
-        at, title = 'data/exponential_forecast_350km.xlsx', "350km Height Plot"
-    if height0 == 400 and checkbox:
-        at, title = 'data/exponential_forecast_400km.xlsx', "400km Height Plot"
-    if height0 == 450 and checkbox:
-        at, title = 'data/exponential_forecast_450km.xlsx', "450km Height Plot"
-    if height0 == 500 and checkbox:
-        at, title = 'data/exponential_forecast_500km.xlsx', "500km Height Plot"
-    if height0 == 550 and checkbox:
-        at, title = 'data/exponential_forecast_550km.xlsx', "550km Height Plot"
-    if height0 == 600 and checkbox:
-        at, title = 'data/exponential_forecast_600km.xlsx', "600km Height Plot"
-    if height0 == 650 and checkbox:
-        at, title = 'data/exponential_forecast_650km.xlsx', "650km Height Plot"
-    if height0 == 700 and checkbox:
-        at, title = 'data/exponential_forecast_700km.xlsx', "700km Height Plot"
-    if height0 == 750 and checkbox:
-        at, title = 'data/exponential_forecast_750km.xlsx', "750km Height Plot"
-    if height0 == 800 and checkbox:
-        at, title = 'data/exponential_forecast_800km.xlsx', "800km Height Plot"
-    if height0 == 850 and checkbox:
-        at, title = 'data/exponential_forecast_850km.xlsx', "850km Height Plot"
-    if height0 == 900 and checkbox:
-        at, title = 'data/exponential_forecast_900km.xlsx', "900km Height Plot"
-    if height0 == 950 and checkbox:
-        at, title = 'data/exponential_forecast_950km.xlsx', "950km Height Plot"
-    if height0 == 1000 and checkbox:
-        at, title = 'data/exponential_forecast_1000km.xlsx', "1000km Height Plot"
-    xx = str(xx)
-    book = xl.load_workbook(at)
-    sheet = book[xx]
-    cell = str(sheet.cell(1, 2).value)
+def data_plot(height, checkbox, yy, mm, xx, season_len, itr, out):
+    prop = ["Argon", "Density", "Temperature", "Atomic Oxygen", "Oxygen", "Atomic Nitrogen", "Nitogen", "Helium", "Hydrogen"]
+
+    title = f"{height}km Height Plot"
+    x = [[], []]                                                         # date / data
+    at = pd.read_csv(f'data/{xx}.csv', header = None)                    # reading the csv file data
     yy, mm = int(yy), int(mm)
-    rr = (yy - 1996) * 12 + mm + 1
-    df = pd.read_excel(at, sheet_name=xx, nrows=rr)
-    fig = px.line(df, x='Date', y=cell, template="simple_white")
-    fig.update_layout(title={'text': title, 'y': 0.9, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top'},
-                      font=dict(family="Courier New, monospace", size=18, color="black"))
+    rr = (yy - 1996) * 12 + mm + 1                                       # find the row based on input date
+    if rr < at.index[-1]:                                                # append data and date to list x
+        for i in range(1, rr, 1):
+            x[0].append(datetime.strptime(at.loc[i, 0], "%d/%m/%Y"))
+            x[1].append(float(at.loc[i, height/50 - 1]))
+    elif rr > at.index[-1]:
+        for i in range(1, at.index[-1], 1):
+            x[0].append(datetime.strptime(at.loc[i, 0], "%d/%m/%Y"))
+            x[1].append(float(at.loc[i, height/50 - 1]))
+        a = parameters(x[1], season_len, int(itr), rr - at.index[-1])     # predict x and append values
+        x[1] = a[4]
+        for i in range(len(a[3])):                                        # appending the new dates
+            last_date = x[0][-1]
+            last_year = last_date.year
+            last_month = last_date.month
+            if last_month == 12:
+                last_year += 1
+                last_month = 0
+            date = datetime(last_year, last_month + 1, 1)
+            x[0].append(date)
+    units = {"Density":"(g/cm^3)", "Temperature":"(keliven)", "Atomic Oxygen":"(atom/cm^3)", "Oxygen":"(particle/cm^3)",
+                "Atomic Nitrogen":"(atom/cm^3)", "Nitogen":"(particle/cm^3)", "Helium":"(atom/cm^3)", "Hydrogen":"(atom/cm^3)"}
+    fig = px.line(x, x=x[0], y=x[1], template="simple_white",labels={'y': f'{xx} {units[xx]}', 'x': 'Date'})
+    fig.update_layout(title={'text': title, 'y': 0.96, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'bottom'},
+                        font=dict(family="Courier New, monospace", size=11, color="black"))
+    fig.update_traces(line_color='orange')
+    fig.update_layout(dragmode='drawopenpath', newshape_line_color='cyan')
     fig.update_layout(xaxis=dict(rangeselector=dict(buttons=list([
-        dict(count=1,
-             label="1m",
-             step="month",
-             stepmode="backward"),
-        dict(count=6,
-             label="6m",
-             step="month",
-             stepmode="backward"),
-        dict(count=1,
-             label="1y",
-             step="year",
-             stepmode="backward"),
-        dict(step="all")])), rangeslider=dict(visible=True), type="date"))
-    fig.show()
-    # if not os.path.exists("images"):
-    #    os.mkdir("images")
-    # fig.write_image("images/fig1.png")
+        dict(count=1, label="1m", step="month", stepmode="backward"), dict(count=6, label="6m", step="month", stepmode="backward"),
+        dict(count=1, label="1y", step="year", stepmode="backward"), dict(step="all")])), rangeslider=dict(visible=True), type="date"))
+    config = {'modeBarButtonsToAdd':['drawline', 'drawopenpath', 'drawclosedpath', 'drawcircle', 'drawrect', 'eraseshape'],
+                            'displaylogo': False, 'displayModeBar': True, "toImageButtonOptions": {"width": 1024, "height": 545}}
+    if out == 'html':
+        newfig = fig.to_html(include_plotlyjs='cdn', config=config)
+        return newfig
+    elif out == 'instant':
+        fig.show(config=config)
+    elif out == 'png':
+        if not os.path.exists("images"):
+            os.mkdir("images")
+        fig.write_image("images/fig1.png")
 
 
 # irradiance functions
 # ----------------------------------------------------------------------------------------------------------------------
 
-
+'''
 def irradiance(yy, mm, phi):
     at = xl.load_workbook('data/Irradiance.xlsx')
     sheet = at['IRR_2030']
@@ -259,6 +209,7 @@ def cell_irr_info(yy, mm, phi):
                   f"The Maximum Irradiance {before_aft} is = {max_irr_bg} W/m^2 \n" \
                   f"occurrence in {max_pg_dat}"
     return flight_info
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # drag functions
@@ -636,4 +587,4 @@ def orb_info_ri(sa, ecc, inc, raan, argp, nu, yy, mm, dd, hh, mn, ss):
                   f"The orbital period = {variable[10]} \n" \
                   f" \n"
     return flight_info
-
+'''

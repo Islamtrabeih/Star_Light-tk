@@ -1,5 +1,5 @@
 from tkinter.filedialog import asksaveasfile
-#from functions import *
+from functions import *
 from tkinter import *
 from tkinter import ttk
 from ttkthemes import ThemedTk
@@ -29,7 +29,6 @@ class App(ThemedTk):
         CMEActivity.cmeactivity_tab(self, ThemedTk)
         Debris.debris_tab(self, ThemedTk)
         Orbit.orbit_tab(self, ThemedTk)
-        self.resizable(True, True)
         self.style = ttk.Style(self)
         bc = "#FC6C85"
         fc = "#7FFFD4"
@@ -132,6 +131,62 @@ class App(ThemedTk):
             self.style.configure('TEntry', background=bc, foreground=fc)
             self.style.configure('TText', background=bc, foreground=fc)
 
+    def atm_result(self, spec):
+        try:
+            zz = self.height_list.get()
+            yy = self.year_list.get()
+            mm = self.month_list.get()
+            pro = {"Density":[self.density.get(), 'g/cm^3'], "Temperature":[self.temperature.get(), 'K'],
+                   "Atomic Oxygen":[self.O_atoms.get(), 'atom/cm^3'], "Nitogen":[self.N2_molecules.get(), 'molecule/cm^3'],
+                   "Argon":[self.Ar_atoms.get(), 'atom/cm^3'], "Atomic Nitrogen":[self.N_atoms.get(), 'atom/cm^3'],
+                   "Helium":[self.He_atoms.get(), 'atom/cm^3'], "Oxygen":[self.O2_molecules.get(), 'molecule/cm^3'],
+                   "Hydrogen":[self.H_atoms.get(), 'atom/cm^3']}
+            if spec == 'result':
+                self.result_text.delete('0.0', END)
+                for key in pro:
+                    if pro[key][0] == True:
+                        data = data_sheets(zz, pro[key][0], yy, mm, key, 144, 10)[0]
+                        self.result_text.insert('end', f'{key} = {data} {pro[key][1]}\n')
+            if spec == 'plot':
+                self.result_box.delete('0.0', END)
+                for key in pro:
+                    if pro[key][0] == True:
+                        data = data_plot(zz, pro[key][0], yy, mm, key, 144, 10, 'instant')
+                        self.result_box.insert('end', cell_atmo_info(zz, pro[key][0], yy, mm, key))
+        except TclError:
+            self.result_text.delete('0.0', END)
+            self.result_text.insert('0.0', "Invalid Height or Date")
+        except KeyError:
+            self.result_text.delete('0.0', END)
+            self.result_text.insert('0.0', "Invalid Height or Date")
+        except ValueError:
+            self.result_text.delete('0.0', END)
+            self.result_text.insert('0.0', "Invalid Date")
+        except UnboundLocalError:
+            self.result_text.delete('0.0', END)
+            self.result_text.insert('0.0', "Invalid Height or select the Argument")
+
+    def cme_result(self, spec):
+        try:
+            self.cme_result_text.delete(0, END)
+            yy = self.cme_year_list.get()
+            mm = self.cme_month_list.get()
+            dd = self.cme_day_list.get()
+            pro = {'central PA': [self.Central_PA.get(), 'degree', 1], 'Linear speed':[self.Linear_Speed.get(), 'Km/s', 2],
+                   'Mass':[self.Mass.get(), 'gram', 4], 'width':[self.Width.get(), 'degree', 6]}
+            if spec == 'result':
+                for key in pro:
+                    data = cme_sheets(pro[key][0], yy, mm, dd, key)[0]
+                    self.cme_result_text.insert('end', f'        {key} = {data} {pro[key][1]}')
+            if spec == 'plot':
+                for key in pro:
+                    data = cme_plot(yy, mm, dd, pro[key][2])
+                    self.cme_result_box.insert(END, cell_cme_info(pro[key][2], yy, mm, dd, key))
+        except ValueError:
+            self.cme_result_text.delete(0, END)
+            self.cme_result_text.insert(0, "Invalid Date or Date is not available")
+
+
 
 class Atmosphere():
     def __init__(self, parent=App):
@@ -149,8 +204,8 @@ class Atmosphere():
         labelDir = ttk.Label(atm_inputs, text="Date :                 ")
         labelDir.grid(column=0, row=1)
         # month Combobox
-        self.month_list = IntVar(None)
-        self.month_list.set("month")
+        self.month_list = IntVar(value="month")
+        # self.month_list.set("month")
         month = ttk.Combobox(atm_inputs, width=14, textvariable=self.month_list)
         month['values'] = [i for i in range(1, 13)]
         month.grid(column=1, row=1)
@@ -189,7 +244,7 @@ class Atmosphere():
         self.H_atoms = IntVar()
         ttk.Checkbutton(atm_inputs, text="Hydrogen", variable=self.H_atoms, style="Switch.TCheckbutton").grid(column=3, row=6, sticky=NW)
         # output
-        result = ttk.Button(atm_outputs, text='Result', width=10, command=show_result)
+        result = ttk.Button(atm_outputs, text='Result', width=10, command=lambda: self.atm_result('result'))
         result.grid(row=7, column=0, sticky=N, padx=0, pady=0)
         # flat, groove, raised, ridge, solid, or sunken
         atmo_frame = ttk.Frame(atm_outputs, style='new.TFrame')
@@ -214,7 +269,7 @@ class Atmosphere():
             except AttributeError:
                 x = 1
 
-        plot = ttk.Button(atm_outputs, text='Plot', width=10, command=data_plot1)
+        plot = ttk.Button(atm_outputs, text='Plot', width=10, command=lambda: self.atm_result('plot'))
         plot.grid(row=10, column=0, sticky=N, padx=0, pady=0)
         save = ttk.Button(atm_outputs, text='Save', width=10, command=atmo_save)
         save.grid(row=11, column=0, sticky=N, padx=0, pady=0)
@@ -293,7 +348,7 @@ class Irradiance():
                 self.irr_result_text.delete(0, 1000)
                 self.irr_result_text.insert('end', "Invalid date or Inclination")
 
-        def irr_plot2():
+        def irr_plot_():
             try:
                 self.irr_result_box.delete('0.0', END)
                 phi, yy, mm = self.lat_enter.get(), self.irr_month_list.get(), self.irr_year_list.get()
@@ -308,7 +363,7 @@ class Irradiance():
         result.grid(row=5, column=0, sticky=N, padx=0, pady=0)
         self.irr_result_text = ttk.Entry(irr_outputs, justify=LEFT)
         self.irr_result_text.grid(row=5, column=1, ipadx=0, ipady=0, columnspan=3, sticky="NSEW")
-        Plot = ttk.Button(irr_outputs, text='Plot', width=10, command=irr_plot2)
+        Plot = ttk.Button(irr_outputs, text='Plot', width=10, command=irr_plot_)
         Plot.grid(row=6, column=0, sticky=N, padx=0, pady=0)
         save = ttk.Button(irr_outputs, text='Save', width=10, command=irr_save)
         save.grid(row=7, column=0, sticky=N, padx=0, pady=0)
@@ -490,8 +545,8 @@ class CMEActivity():
         ttk.Checkbutton(cme_inputs, text="Central PA", variable=self.Central_PA, style="Switch.TCheckbutton").grid(column=2, row=3)
         self.Linear_Speed = IntVar()
         ttk.Checkbutton(cme_inputs, text="Linear_Speed", variable=self.Linear_Speed, style="Switch.TCheckbutton").grid(column=1, row=3)
-        self.MPA = IntVar()
-        ttk.Checkbutton(cme_inputs, text="Mass         ", variable=self.MPA, style="Switch.TCheckbutton").grid(column=2, row=4, pady=5)
+        self.Mass = IntVar()
+        ttk.Checkbutton(cme_inputs, text="Mass         ", variable=self.Mass, style="Switch.TCheckbutton").grid(column=2, row=4, pady=5)
         self.Width = IntVar()
         ttk.Checkbutton(cme_inputs, text="Width         ", variable=self.Width, style="Switch.TCheckbutton").grid(column=3, row=3)
         # output
@@ -507,11 +562,11 @@ class CMEActivity():
             except AttributeError:
                 x = 1
 
-        result = ttk.Button(cme_outputs, text='Result', width=10, command=cme_result)
+        result = ttk.Button(cme_outputs, text='Result', width=10, command=lambda: self.cme_result('result'))
         result.grid(row=5, column=0, sticky=N, padx=0, pady=0)
         self.cme_result_text = ttk.Entry(cme_outputs, justify=LEFT)
         self.cme_result_text.grid(row=5, column=1, ipadx=0, ipady=0, columnspan=3, sticky="NSEW")
-        Plot = ttk.Button(cme_outputs, text='Plot', width=10, command=cme_plot1)
+        Plot = ttk.Button(cme_outputs, text='Plot', width=10, command=lambda: self.cme_result('plot'))
         Plot.grid(row=6, column=0, sticky=N, padx=0, pady=0)
         save = ttk.Button(cme_outputs, text='Save', width=10, command=cme_save)
         save.grid(row=7, column=0, sticky=N, padx=0, pady=0)
@@ -785,211 +840,6 @@ class Orbit():
         for row in range(4):
             vis_outputs.rowconfigure(row, weight=1)
 
-
-
-'''
-bc = "gray"
-fc = "black"
-s = ttk.Style()
-s.configure('TFrame', background=bc, foreground=fc)
-s.configure('TCombobox', background=bc, fieldbackground=bc, foreground=fc, darkcolor=bc, selectbackground="grey", lightcolor="lime")
-s.configure('TCheckbutton', background=bc, foreground=fc)
-s.configure('TButton', background=bc, foreground=fc)
-s.configure('TLabel', background=bc, foreground=fc)
-s.configure('TEntry', background=bc, foreground=fc)
-s.configure('TNotebook', background=bc, foreground=fc)
-s.configure('TLabelFrame', background=bc, foreground=fc)
-s.configure('Vertical.TScrollbar', background=bc, foreground=fc)
-'''
-
-# atmosphere
-# ---------------------------------------------------------------------------------------------------------------------
-
-def show_result():
-    '''
-    try:
-        result1.delete('0.0', END)
-        zz1 = height_list.get()
-        yy1 = year.get()
-        mm1 = month.get()
-
-        dd1 = density1.get()
-        if dd1:
-            data1 = data_sheets(zz1, dd1, yy1, mm1, 'density')[0]
-            result1.insert('end', f'Density = {data1} g/cm^3')
-        tt1 = temperature1.get()
-        if tt1:
-            data1 = data_sheets(zz1, tt1, yy1, mm1, 'temperature')[0]
-            result1.insert('end', f'\nTemperature = {data1} K')
-        O1 = O_atoms1.get()
-        if O1:
-            data1 = data_sheets(zz1, O1, yy1, mm1, 'O_atoms')[0]
-            result1.insert('end', f'\nAtomic Oxygen = {data1} (O)Atom/cm^3')
-        N2 = N2_molecules1.get()
-        if N2:
-            data1 = data_sheets(zz1, N2, yy1, mm1, 'N2_molecules')[0]
-            result1.insert('end', f'\nNitrogen = {data1} (N)Molecule/cm^3')
-        Ar1 = Ar_atoms1.get()
-        if Ar1:
-            data1 = data_sheets(zz1, Ar1, yy1, mm1, 'Ar_atoms')[0]
-            result1.insert('end', f'\nArgon = {data1} (Ar)Atom/cm^3')
-        N1 = N_atoms1.get()
-        if N1:
-            data1 = data_sheets(zz1, N1, yy1, mm1, 'N_atoms')[0]
-            result1.insert('end', f'\nAtomic Nitrogen = {data1} (N)Atom/cm^3')
-        He1 = He_atoms1.get()
-        if He1:
-            data1 = data_sheets(zz1, He1, yy1, mm1, 'He_atoms')[0]
-            result1.insert('end', f'\nHelium = {data1} (He)Atom/cm^3')
-        O2 = O2_molecules1.get()
-        if O2:
-            data1 = data_sheets(zz1, O2, yy1, mm1, 'O2_molecules')[0]
-            result1.insert('end', f'\nOxygen = {data1} (O)Molecule/cm^3')
-        H1 = H_atoms1.get()
-        if H1:
-            data1 = data_sheets(zz1, H1, yy1, mm1, 'H_atoms')[0]
-            result1.insert('end', f'\nHydrogen = {data1} (H)Atom/cm^3')
-    except TclError:
-        result1.delete('0.0', END)
-        result1.insert('0.0', "Invalid Height")
-    except KeyError:
-        result1.delete('0.0', END)
-        result1.insert('0.0', "Invalid Height")
-    except ValueError:
-        result1.delete('0.0', END)
-        result1.insert('0.0', "Invalid Date")
-    except UnboundLocalError:
-        result1.delete('0.0', END)
-        result1.insert('0.0', "Invalid Height or select the Argument")
-    '''
-    pass
-
-
-def data_plot1():
-    '''
-    try:
-        result2.delete('0.0', END)
-        zz1 = height_list.get()
-        yy1 = year.get()
-        mm1 = month.get()
-        dd1 = density1.get()
-        if dd1:
-            data1 = data_plot(zz1, 1, yy1, mm1, 'density')
-            result2.insert(END, cell_atmo_info(zz1, 1, yy1, mm1, 'density'))
-        tt1 = temperature1.get()
-        if tt1:
-            data1 = data_plot(zz1, 1, yy1, mm1, 'temperature')
-            result2.insert(END, cell_atmo_info(zz1, 1, yy1, mm1, 'temperature'))
-        O1 = O_atoms1.get()
-        if O1:
-            data1 = data_plot(zz1, 1, yy1, mm1, 'O_atoms')
-            result2.insert(END, cell_atmo_info(zz1, 1, yy1, mm1, 'O_atoms'))
-        N1 = N_atoms1.get()
-        if N1:
-            data1 = data_plot(zz1, 1, yy1, mm1, 'N_atoms')
-            result2.insert(END, cell_atmo_info(zz1, 1, yy1, mm1, 'N_atoms'))
-        N2 = N2_molecules1.get()
-        if N2:
-            data1 = data_plot(zz1, 1, yy1, mm1, 'N2_molecules')
-            result2.insert(END, cell_atmo_info(zz1, 1, yy1, mm1, 'N2_molecules'))
-        O2 = O2_molecules1.get()
-        if O2:
-            data1 = data_plot(zz1, 1, yy1, mm1, 'O2_molecules')
-            result2.insert(END, cell_atmo_info(zz1, 1, yy1, mm1, 'O2_molecules'))
-        Ar1 = Ar_atoms1.get()
-        if Ar1:
-            data1 = data_plot(zz1, 1, yy1, mm1, 'Ar_atoms')
-            result2.insert(END, cell_atmo_info(zz1, 1, yy1, mm1, 'Ar_atoms'))
-        He1 = He_atoms1.get()
-        if He1:
-            data1 = data_plot(zz1, 1, yy1, mm1, 'He_atoms')
-            result2.insert(END, cell_atmo_info(zz1, 1, yy1, mm1, 'He_atoms'))
-        H1 = H_atoms1.get()
-        if H1:
-            data1 = data_plot(zz1, 1, yy1, mm1, 'H_atoms')
-            result2.insert(END, cell_atmo_info(zz1, 1, yy1, mm1, 'H_atoms'))
-    except TclError:
-        result2.delete('0.0', END)
-        result2.insert('0.0', "Invalid Height")
-    except KeyError:
-        result2.delete('0.0', END)
-        result2.insert('0.0', "Invalid Height")
-    except ValueError:
-        result2.delete('0.0', END)
-        result2.insert('0.0', "Invalid Date")
-    except UnboundLocalError:
-        result2.delete('0.0', END)
-        result2.insert('0.0', "Invalid Height or select the Argument")
-    '''
-    pass
-
-
-# cme activity
-# ---------------------------------------------------------------------------------------------------------------------
-
-
-def cme_result():
-    '''
-    try:
-        result10.delete(0, END)
-        yy1 = year4.get()
-        mm1 = month4.get()
-        dd1 = day.get()
-        cpa = Central_PA.get()
-        if cpa:
-            data1 = cme_sheets(1, yy1, mm1, dd1, 'central PA')[0]
-            result10.insert('end', f'        Central PA = {data1} degree')
-        ls = Linear_Speed.get()
-        if ls:
-            data1 = cme_sheets(1, yy1, mm1, dd1, 'Linear speed')[0]
-            result10.insert('end', f'        Linear speed = {data1} Km/s')
-        mpa = MPA.get()
-        if mpa:
-            data1 = cme_sheets(1, yy1, mm1, dd1, 'Mass')[0]
-            result10.insert('end', f'        Mass = {data1} gram')
-        wdth = Width.get()
-        if wdth:
-            data1 = cme_sheets(1, yy1, mm1, dd1, 'width')[0]
-            result10.insert('end', f'        Width = {data1} degree')
-    except ValueError:
-        result10.delete(0, END)
-        result10.insert(0, "Invalid Date or Date is not available")
-    '''
-    pass
-
-
-def cme_plot1():
-    '''
-    try:
-        result11.delete('0.0', END)
-        yy1 = year4.get()
-        mm1 = month4.get()
-        dd1 = day.get()
-        cpa = Central_PA.get()
-        if cpa:
-            data1 = cme_plot(yy1, mm1, dd1, 1)
-            result11.insert(END, cell_cme_info(1, yy1, mm1, dd1, 'central PA'))
-        ls = Linear_Speed.get()
-        if ls:
-            data1 = cme_plot(yy1, mm1, dd1, 2)
-            result11.insert(END, cell_cme_info(1, yy1, mm1, dd1, 'Linear speed'))
-        mpa = MPA.get()
-        if mpa:
-            data1 = cme_plot(yy1, mm1, dd1, 4)
-            result11.insert(END, cell_cme_info(1, yy1, mm1, dd1, 'Mass'))
-        wdth = Width.get()
-        if wdth:
-            data1 = cme_plot(yy1, mm1, dd1, 6)
-            result11.insert(END, cell_cme_info(1, yy1, mm1, dd1, 'width'))
-    except ValueError:
-        result10.delete(0, END)
-        result10.insert(0, "Invalid Date or Date is not available")
-    '''
-    pass
-
-
-# window pack
-# ---------------------------------------------------------------------------------------------------------------------
 
 
 app = App()
