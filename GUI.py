@@ -351,8 +351,8 @@ class Irradiance():
         def irr_plot_():
 
             self.irr_result_box.delete('0.0', END)
-            phi, yy, mm = self.lat_enter.get(), self.irr_month_list.get(), self.irr_year_list.get()
-            y = irr_plot(yy, mm)
+            phi, yy, mm = self.lat_enter.get(), self.irr_year_list.get(), self.irr_month_list.get()
+            y = irr_plot(yy, mm, 144, 10)
             x = irr_plot1(yy, mm, phi)
             self.irr_result_box.insert('end', f'{cell_irr_info(yy, mm, phi)}')
 

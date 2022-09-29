@@ -128,7 +128,7 @@ def irradiance(yy, mm, phi):
         for i in range(1, at.index[-1], 1):
             x[0].append(datetime.strptime(at.loc[i, 0], "%d/%m/%Y"))
             x[1].append(float(at.loc[i, 1]))
-        a = parameters(x[1], season_len, int(itr), rr - at.index[-1])     # predict x and append values
+        a = parameters(x[1], 144, int(10), rr - at.index[-1])     # predict x and append values
         x[1] = a[4]
         for i in range(len(a[3])):                                        # appending the new dates
             last_date = x[0][-1]
@@ -160,12 +160,12 @@ def irradiance(yy, mm, phi):
     return true_irr, irr, direction, dt, maximum, before_after
 
 
-def irr_plot(yy, mm):
+def irr_plot(yy, mm, season_len, itr):
     x = [[], []]
     at = pd.read_csv(f'data/Irradiance.csv', header = None)
     yy, mm = int(yy), int(mm)
-    rr = (yy - 1976 )* 12 + mm + 1
-    if rr < at.index[-1]:                                                # append data and date to list x
+    rr = (yy - 1976)* 12 + mm + 1
+    if rr < at.index[-1]:                                                 # append data and date to list x
         for i in range(1, rr, 1):
             x[0].append(datetime.strptime(at.loc[i, 0], "%d/%m/%Y"))
             x[1].append(float(at.loc[i, 1]))
@@ -185,7 +185,7 @@ def irr_plot(yy, mm):
             date = datetime(last_year, last_month + 1, 1)
             x[0].append(date)
     fig = px.line(x, x=x[0], y=x[1], template="simple_white",labels={'y': f'Irradiance', 'x': 'Date'})
-    fig.update_layout(title={'text': title, 'y': 0.96, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'bottom'},
+    fig.update_layout(title={'text':'Irradiance Plot', 'y': 0.96, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'bottom'},
                         font=dict(family="Courier New, monospace", size=11, color="black"))
     fig.update_traces(line_color='orange')
     fig.update_layout(dragmode='drawopenpath', newshape_line_color='cyan')
@@ -194,15 +194,8 @@ def irr_plot(yy, mm):
         dict(count=1, label="1y", step="year", stepmode="backward"), dict(step="all")])), rangeslider=dict(visible=True), type="date"))
     config = {'modeBarButtonsToAdd':['drawline', 'drawopenpath', 'drawclosedpath', 'drawcircle', 'drawrect', 'eraseshape'],
                             'displaylogo': False, 'displayModeBar': True, "toImageButtonOptions": {"width": 1024, "height": 545}}
-    if out == 'html':
-        newfig = fig.to_html(include_plotlyjs='cdn', config=config)
-        return newfig
-    elif out == 'instant':
-        fig.show(config=config)
-    elif out == 'png':
-        if not os.path.exists("images"):
-            os.mkdir("images")
-        fig.write_image("images/fig1.png")
+    fig.show(config=config)
+
 
 def irr_plot1(yy, mm, phi):
     x = [[], []]
