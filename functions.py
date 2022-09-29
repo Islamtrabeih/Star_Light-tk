@@ -112,33 +112,40 @@ def data_plot(height, checkbox, yy, mm, xx, season_len, itr, out):
 # irradiance functions
 # ----------------------------------------------------------------------------------------------------------------------
 
-'''
+
 def irradiance(yy, mm, phi):
-    at = xl.load_workbook('data/Irradiance.xlsx')
-    sheet = at['IRR_2030']
+    at = pd.read_csv(f'data/Irradiance.csv', header = None)
     yy, mm = int(yy), int(mm)
-    rr = (yy - 1996) * 12 + mm + 1
-    cell0 = sheet.cell(rr, 2)
-    cell1 = sheet.cell(rr, 1)
-    true_irr = cell0.value
-    until_da = cell1.value
+    rr = (yy - 1976) * 12 + mm + 1
+    x = [[], []]
+    if rr < at.index[-1]:                                                # append data and date to list x
+        for i in range(1, rr, 1):
+            x[0].append(datetime.strptime(at.loc[i, 0], "%d/%m/%Y"))
+            x[1].append(float(at.loc[i, 1]))
+        true_irr = x[1][-1]
+        until_da = x[0][-1]
+    elif rr > at.index[-1]:
+        for i in range(1, at.index[-1], 1):
+            x[0].append(datetime.strptime(at.loc[i, 0], "%d/%m/%Y"))
+            x[1].append(float(at.loc[i, 1]))
+        a = parameters(x[1], season_len, int(itr), rr - at.index[-1])     # predict x and append values
+        x[1] = a[4]
+        for i in range(len(a[3])):                                        # appending the new dates
+            last_date = x[0][-1]
+            last_year = last_date.year
+            last_month = last_date.month
+            if last_month == 12:
+                last_year += 1
+                last_month = 0
+            date = datetime(last_year, last_month + 1, 1)
+            x[0].append(date)
+        true_irr = x[1][-1]
+        until_da = x[0][-1]
     irr = true_irr * cos(float(phi) * (pi/180))
-    if rr > 297:
-        st = 297
+    if rr > at.index[-1]:
         before_after = f"since 2020 until {until_da}"
     else:
-        st = 2
         before_after = f"since 1996 until {until_da}"
-    x = []                                                        # data values to calculate max
-    for row in sheet[f'B{st}':f'B{rr}']:
-        for cell in row:
-            y = cell.value
-            x.append(y)
-    maximum = max(x)                                               # maximum at forcast
-    for row in sheet[f'B{st}':f'B{rr}']:
-        for cell in row:
-            if cell.value == maximum:
-                dt = sheet.cell(row=cell.row, column=1).value      # date of max
     angle = float(phi)
     counter = 0
     while angle > 90:
@@ -148,36 +155,54 @@ def irradiance(yy, mm, phi):
         direction = "Direct Orbit"
     else:
         direction = "Retrograde Orbit"
+    maximum = max(x[1])
+    dt = x[0][x[1].index(maximum)]
     return true_irr, irr, direction, dt, maximum, before_after
 
 
 def irr_plot(yy, mm):
-    at = 'data/Irradiance.xlsx'
-    book = xl.load_workbook(at)
-    sheet = book['IRR_2030']
-    cell = str(sheet.cell(1, 2).value)
+    x = [[], []]
+    at = pd.read_csv(f'data/Irradiance.csv', header = None)
     yy, mm = int(yy), int(mm)
-    rr = (yy - 1996) * 12 + mm + 1
-    df = pd.read_excel(at, sheet_name='IRR_2030', nrows=rr)
-    fig = px.line(df, x='time (yyyy-MM-dd)', y=cell, template="simple_white")
-    fig.update_layout(title={'text': "Irradiance", 'y': 0.9, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top'},
-                      font=dict(family="Courier New, monospace", size=18, color="black"))
+    rr = (yy - 1976 )* 12 + mm + 1
+    if rr < at.index[-1]:                                                # append data and date to list x
+        for i in range(1, rr, 1):
+            x[0].append(datetime.strptime(at.loc[i, 0], "%d/%m/%Y"))
+            x[1].append(float(at.loc[i, 1]))
+    elif rr > at.index[-1]:
+        for i in range(1, at.index[-1], 1):
+            x[0].append(datetime.strptime(at.loc[i, 0], "%d/%m/%Y"))
+            x[1].append(float(at.loc[i, 1]))
+        a = parameters(x[1], season_len, int(itr), rr - at.index[-1])     # predict x and append values
+        x[1] = a[4]
+        for i in range(len(a[3])):                                        # appending the new dates
+            last_date = x[0][-1]
+            last_year = last_date.year
+            last_month = last_date.month
+            if last_month == 12:
+                last_year += 1
+                last_month = 0
+            date = datetime(last_year, last_month + 1, 1)
+            x[0].append(date)
+    fig = px.line(x, x=x[0], y=x[1], template="simple_white",labels={'y': f'Irradiance', 'x': 'Date'})
+    fig.update_layout(title={'text': title, 'y': 0.96, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'bottom'},
+                        font=dict(family="Courier New, monospace", size=11, color="black"))
+    fig.update_traces(line_color='orange')
+    fig.update_layout(dragmode='drawopenpath', newshape_line_color='cyan')
     fig.update_layout(xaxis=dict(rangeselector=dict(buttons=list([
-        dict(count=1,
-             label="1m",
-             step="month",
-             stepmode="backward"),
-        dict(count=6,
-             label="6m",
-             step="month",
-             stepmode="backward"),
-        dict(count=1,
-             label="1y",
-             step="year",
-             stepmode="backward"),
-        dict(step="all")])), rangeslider=dict(visible=True), type="date"))
-    fig.show()
-
+        dict(count=1, label="1m", step="month", stepmode="backward"), dict(count=6, label="6m", step="month", stepmode="backward"),
+        dict(count=1, label="1y", step="year", stepmode="backward"), dict(step="all")])), rangeslider=dict(visible=True), type="date"))
+    config = {'modeBarButtonsToAdd':['drawline', 'drawopenpath', 'drawclosedpath', 'drawcircle', 'drawrect', 'eraseshape'],
+                            'displaylogo': False, 'displayModeBar': True, "toImageButtonOptions": {"width": 1024, "height": 545}}
+    if out == 'html':
+        newfig = fig.to_html(include_plotlyjs='cdn', config=config)
+        return newfig
+    elif out == 'instant':
+        fig.show(config=config)
+    elif out == 'png':
+        if not os.path.exists("images"):
+            os.mkdir("images")
+        fig.write_image("images/fig1.png")
 
 def irr_plot1(yy, mm, phi):
     x = [[], []]
@@ -210,7 +235,7 @@ def cell_irr_info(yy, mm, phi):
                   f"occurrence in {max_pg_dat}"
     return flight_info
 
-
+    print(x)
 # ----------------------------------------------------------------------------------------------------------------------
 # drag functions
 # ----------------------------------------------------------------------------------------------------------------------
@@ -587,4 +612,4 @@ def orb_info_ri(sa, ecc, inc, raan, argp, nu, yy, mm, dd, hh, mn, ss):
                   f"The orbital period = {variable[10]} \n" \
                   f" \n"
     return flight_info
-'''
+

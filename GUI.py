@@ -314,7 +314,7 @@ class Irradiance():
         self.irr_year_list = StringVar(None)
         self.irr_year_list.set('year')
         year = ttk.Combobox(irr_inputs, width=14, textvariable=self.irr_year_list)
-        year['values'] = [i for i in range(1996, 2031)]
+        year['values'] = [i for i in range(1976, 2031)]
         year.grid(column=2, row=1)
         # Labels
         date_irr = ttk.Label(irr_inputs, text='Date :         ')
@@ -341,23 +341,21 @@ class Irradiance():
         def irr_result():
             try:
                 self.irr_result_text.delete(0, 1000)
-                ph, yy, mm = self.lat_enter.get(), self.irr_month_list.get(), self.irr_year_list.get()
-                data1= irradiance(yy, mm, ph)
+                ph, yy, mm = self.lat_enter.get(), self.irr_year_list.get(), self.irr_month_list.get()
+                data = irradiance(yy, mm, ph)
                 self.irr_result_text.insert('end', f'maximum = {data[0]} W/m^2' + '    ' + f'minimum = {data[1]} W/m^2')
             except ValueError:
                 self.irr_result_text.delete(0, 1000)
                 self.irr_result_text.insert('end', "Invalid date or Inclination")
 
         def irr_plot_():
-            try:
-                self.irr_result_box.delete('0.0', END)
-                phi, yy, mm = self.lat_enter.get(), self.irr_month_list.get(), self.irr_year_list.get()
-                y = irr_plot(yy, mm)
-                x = irr_plot1(yy, mm, phi)
-                self.irr_result_box.insert('end', f'{cell_irr_info(yy, mm, phi)}')
-            except ValueError:
-                self.irr_result_box.delete('0.0', END)
-                self.irr_result_box.insert('end', "Invalid date or Inclination")
+
+            self.irr_result_box.delete('0.0', END)
+            phi, yy, mm = self.lat_enter.get(), self.irr_month_list.get(), self.irr_year_list.get()
+            y = irr_plot(yy, mm)
+            x = irr_plot1(yy, mm, phi)
+            self.irr_result_box.insert('end', f'{cell_irr_info(yy, mm, phi)}')
+
 
         result = ttk.Button(irr_outputs, text='Result', width=10, command=irr_result)
         result.grid(row=5, column=0, sticky=N, padx=0, pady=0)
