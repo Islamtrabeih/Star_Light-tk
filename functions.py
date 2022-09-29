@@ -145,7 +145,7 @@ def irradiance(yy, mm, phi):
     if rr > at.index[-1]:
         before_after = f"since 2020 until {until_da}"
     else:
-        before_after = f"since 1996 until {until_da}"
+        before_after = f"since 1976 until {until_da}"
     angle = float(phi)
     counter = 0
     while angle > 90:
@@ -220,22 +220,23 @@ def irr_plot1(yy, mm, phi):
 
 
 def cell_irr_info(yy, mm, phi):
-    total_irr = irradiance(yy, mm, phi)[0]
-    max_irr = irradiance(yy, mm, phi)[0]
-    min_irr = irradiance(yy, mm, phi)[1]
-    orbit_type = irradiance(yy, mm, phi)[2]
-    max_pg_dat = irradiance(yy, mm, phi)[3]
-    max_irr_bg = irradiance(yy, mm, phi)[4]
-    before_aft = irradiance(yy, mm, phi)[5]
+    var_able = irradiance(yy, mm, phi)
+    total_irr = var_able[0]
+    max_irr = var_able[0]
+    min_irr = var_able[1]
+    orbit_type = var_able[2]
+    max_dat = var_able[3]
+    max_irr_bg = var_able[4]
+    before_aft = var_able[5]
     flight_info = f"Total Solar Irradiance = {total_irr} W/m^2 \n" \
                   f"Maximum Solar Irradiance at latitude 0 degree = {max_irr} W/m^2 \n" \
                   f"Minimum solar Irradiance at latitude {phi} degree = {min_irr} W/m^2 \n" \
                   f"Orbit Type = {orbit_type} \n" \
                   f"The Maximum Irradiance {before_aft} is = {max_irr_bg} W/m^2 \n" \
-                  f"occurrence in {max_pg_dat}"
+                  f"occurrence in {max_dat}"
     return flight_info
 
-    print(x)
+
 # ----------------------------------------------------------------------------------------------------------------------
 # drag functions
 # ----------------------------------------------------------------------------------------------------------------------
