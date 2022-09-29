@@ -209,7 +209,14 @@ def irr_plot1(yy, mm, phi):
                       yaxis_title="Irradiance W/m^2",
                       font=dict(family="Courier New, monospace", size=18, color="black"))
     fig.update_layout(xaxis=dict(rangeslider=dict(visible=True)))
-    fig.show()
+    fig.update_traces(line_color='orange')
+    fig.update_layout(dragmode='drawopenpath', newshape_line_color='cyan')
+    fig.update_layout(xaxis=dict(rangeselector=dict(buttons=list([
+        dict(count=1, label="1m", step="month", stepmode="backward"), dict(count=6, label="6m", step="month", stepmode="backward"),
+        dict(count=1, label="1y", step="year", stepmode="backward"), dict(step="all")])), rangeslider=dict(visible=True), type="date"))
+    config = {'modeBarButtonsToAdd':['drawline', 'drawopenpath', 'drawclosedpath', 'drawcircle', 'drawrect', 'eraseshape'],
+                            'displaylogo': False, 'displayModeBar': True, "toImageButtonOptions": {"width": 1024, "height": 545}}
+    fig.show(config=config)
 
 
 def cell_irr_info(yy, mm, phi):
