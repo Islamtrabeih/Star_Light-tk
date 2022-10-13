@@ -137,22 +137,22 @@ class App(ThemedTk):
             yy = self.year_list.get()
             mm = self.month_list.get()
             pro = {"Density":[self.density.get(), 'g/cm^3'], "Temperature":[self.temperature.get(), 'K'],
-                   "Atomic Oxygen":[self.O_atoms.get(), 'atom/cm^3'], "Nitogen":[self.N2_molecules.get(), 'molecule/cm^3'],
-                   "Argon":[self.Ar_atoms.get(), 'atom/cm^3'], "Atomic Nitrogen":[self.N_atoms.get(), 'atom/cm^3'],
-                   "Helium":[self.He_atoms.get(), 'atom/cm^3'], "Oxygen":[self.O2_molecules.get(), 'molecule/cm^3'],
-                   "Hydrogen":[self.H_atoms.get(), 'atom/cm^3']}
+                    "Atomic Oxygen":[self.O_atoms.get(), 'atom/cm^3'], "Nitrogen":[self.N2_molecules.get(), 'molecule/cm^3'],
+                    "Argon":[self.Ar_atoms.get(), 'atom/cm^3'], "Atomic Nitrogen":[self.N_atoms.get(), 'atom/cm^3'],
+                    "Helium":[self.He_atoms.get(), 'atom/cm^3'], "Oxygen":[self.O2_molecules.get(), 'molecule/cm^3'],
+                    "Hydrogen":[self.H_atoms.get(), 'atom/cm^3']}
             if spec == 'result':
                 self.result_text.delete('0.0', END)
                 for key in pro:
                     if pro[key][0] == True:
-                        data = data_sheets(zz, pro[key][0], yy, mm, key, 144, 10)[0]
+                        data = data_sheets(zz, yy, mm, key, 144, 10)[0]
                         self.result_text.insert('end', f'{key} = {data} {pro[key][1]}\n')
             if spec == 'plot':
                 self.result_box.delete('0.0', END)
                 for key in pro:
                     if pro[key][0] == True:
-                        data = data_plot(zz, pro[key][0], yy, mm, key, 144, 10, 'instant')
-                        self.result_box.insert('end', cell_atmo_info(zz, pro[key][0], yy, mm, key))
+                        data = data_plot(zz, yy, mm, key, 144, 10, 'instant')
+                        self.result_box.insert('end', cell_atmo_info(zz, yy, mm, key))
         except TclError:
             self.result_text.delete('0.0', END)
             self.result_text.insert('0.0', "Invalid Height or Date")
@@ -172,17 +172,24 @@ class App(ThemedTk):
             yy = self.cme_year_list.get()
             mm = self.cme_month_list.get()
             dd = self.cme_day_list.get()
-            pro = {'central PA': [self.Central_PA.get(), 'degree', 1], 'Linear speed':[self.Linear_Speed.get(), 'Km/s', 2],
-                   'Mass':[self.Mass.get(), 'gram', 4], 'width':[self.Width.get(), 'degree', 6]}
+            pro = {'Central PA': [self.Central_PA.get(), 'degree', 1], 'Linear Speed':[self.Linear_Speed.get(), 'Km/s', 2],
+                   'MPA':[self.MPA.get(), 'Km/s', 3], 'Width':[self.Width.get(), 'degree', 5],
+                   'SSN':[self.SSN.get(), 'Spot', 6]}
             if spec == 'result':
                 for key in pro:
-                    data = cme_sheets(pro[key][0], yy, mm, dd, key)[0]
-                    self.cme_result_text.insert('end', f'        {key} = {data} {pro[key][1]}')
+                    if pro[key][0] == True:
+                        data = cme_sheets(yy, mm, dd, key, 4383, 10)[0]
+                        self.cme_result_text.insert('end', f'{key} = {data} {pro[key][1]}  ')
             if spec == 'plot':
+                self.cme_result_box.delete(0, END)
                 for key in pro:
-                    data = cme_plot(yy, mm, dd, pro[key][2])
-                    self.cme_result_box.insert(END, cell_cme_info(pro[key][2], yy, mm, dd, key))
+                    if pro[key][0] == True:
+                        data = cme_plot(yy, mm, dd, key, 4383, 10, 'instant')
+                        self.cme_result_box.insert(END, cell_cme_info(yy, mm, dd, key))
         except ValueError:
+            self.cme_result_text.delete(0, END)
+            self.cme_result_text.insert(0, "Invalid Date or Date is not available")
+        except TclError:
             self.cme_result_text.delete(0, END)
             self.cme_result_text.insert(0, "Invalid Date or Date is not available")
 
@@ -342,20 +349,22 @@ class Irradiance():
             try:
                 self.irr_result_text.delete(0, 1000)
                 ph, yy, mm = self.lat_enter.get(), self.irr_year_list.get(), self.irr_month_list.get()
-                data = irradiance(yy, mm, ph)
+                data = irradiance(yy, mm, ph, 144, 10)
                 self.irr_result_text.insert('end', f'maximum = {data[0]} W/m^2' + '    ' + f'minimum = {data[1]} W/m^2')
             except ValueError:
                 self.irr_result_text.delete(0, 1000)
                 self.irr_result_text.insert('end', "Invalid date or Inclination")
 
         def irr_plot_():
-
-            self.irr_result_box.delete('0.0', END)
-            phi, yy, mm = self.lat_enter.get(), self.irr_year_list.get(), self.irr_month_list.get()
-            y = irr_plot(yy, mm, 144, 10)
-            x = irr_plot1(yy, mm, phi)
-            self.irr_result_box.insert('end', f'{cell_irr_info(yy, mm, phi)}')
-
+            try:
+                self.irr_result_box.delete('0.0', END)
+                phi, yy, mm = self.lat_enter.get(), self.irr_year_list.get(), self.irr_month_list.get()
+                y = irr_plot(yy, mm, 144, 10)
+                x = irr_plot1(yy, mm, phi, 144, 10)
+                self.irr_result_box.insert('end', f'{cell_irr_info(yy, mm, phi, 144, 10)}')
+            except ValueError:
+                self.irr_result_text.delete(0, 1000)
+                self.irr_result_text.insert('end', "Invalid date or Inclination")
 
         result = ttk.Button(irr_outputs, text='Result', width=10, command=irr_result)
         result.grid(row=5, column=0, sticky=N, padx=0, pady=0)
@@ -462,7 +471,7 @@ class Drag():
         def lifetime():
             try:
                 self.orbitdrag.delete('0.0', END)
-                yy, mm = self.drg_month_list.get(), self.drg_month_list.get()
+                yy, mm = self.drg_year_list.get(), self.drg_month_list.get()
                 s_a, ecc = float(self.life_sem_enter.get()), float(self.life_ecc_enter.get())
                 mass, true, area = float(self.life_mass_enter.get()), float(self.life_true_enter.get()), float(self.life_area_enter.get())
                 s_a_check, oblateness, drag = self.semi_major_axis.get(), self.earth_oblate.get(), self.atmo_drag.get()
@@ -474,7 +483,7 @@ class Drag():
                                             f'it would take {x[1]} second to be 100 km orbit')
                 if ecc_check:
                     if drag:
-                        x = e_drag(s_a, ecc, true, area0, mass, yy, mm)
+                        x = e_drag(s_a, ecc, true, area, mass, yy, mm)
                         self.orbitdrag.insert(END, f' \nvariation of e = {x[0]} \n'
                                             f'it would take {x[1]} second to be circular orbit')
             except ValueError:
@@ -540,13 +549,15 @@ class CMEActivity():
         year.grid(column=3, row=1)
         # check box
         self.Central_PA = IntVar()
-        ttk.Checkbutton(cme_inputs, text="Central PA", variable=self.Central_PA, style="Switch.TCheckbutton").grid(column=2, row=3)
+        ttk.Checkbutton(cme_inputs, text="CME Central PA", variable=self.Central_PA, style="Switch.TCheckbutton").grid(column=2, row=3)
         self.Linear_Speed = IntVar()
-        ttk.Checkbutton(cme_inputs, text="Linear_Speed", variable=self.Linear_Speed, style="Switch.TCheckbutton").grid(column=1, row=3)
-        self.Mass = IntVar()
-        ttk.Checkbutton(cme_inputs, text="Mass         ", variable=self.Mass, style="Switch.TCheckbutton").grid(column=2, row=4, pady=5)
+        ttk.Checkbutton(cme_inputs, text="CME Linear_Speed", variable=self.Linear_Speed, style="Switch.TCheckbutton").grid(column=1, row=3)
+        self.SSN = IntVar()
+        ttk.Checkbutton(cme_inputs, text="SSN_", variable=self.SSN, style="Switch.TCheckbutton").grid(column=3, row=4, pady=5)
         self.Width = IntVar()
-        ttk.Checkbutton(cme_inputs, text="Width         ", variable=self.Width, style="Switch.TCheckbutton").grid(column=3, row=3)
+        ttk.Checkbutton(cme_inputs, text="CME Width", variable=self.Width, style="Switch.TCheckbutton").grid(column=3, row=3)
+        self.MPA = IntVar()
+        ttk.Checkbutton(cme_inputs, text="CME MPA_", variable=self.MPA, style="Switch.TCheckbutton").grid(column=1, row=4)
         # output
 
         def cme_save():
@@ -599,66 +610,25 @@ class Debris():
         deb_inputs.grid(column=0, row=0, columnspan=2, sticky="WE", padx=5, pady=0, ipadx=0, ipady=0)
         deb_outputs = ttk.LabelFrame(self.tab5, text="result")
         deb_outputs.grid(column=0, row=1, columnspan=2, sticky="WE", padx=5, pady=0, ipadx=0, ipady=0)
-        # a, ecc, inc, raan, argp, nu, yy, mm, dd, hh, mn, ss
-        # date
-        deb_date = ttk.Label(deb_inputs, text="Date :                 ")
-        deb_date.grid(column=0, row=1, padx=10, sticky=W)
-        # day
-        self.deb_day_list = IntVar(None)
-        self.deb_day_list.set("day")
-        day = ttk.Combobox(deb_inputs, width=14, textvariable=self.deb_day_list)
-        day['values'] = [i for i in range(1, 32)]
-        day.grid(column=1, row=1)
-        # months options button
-        self.deb_month_list = IntVar(None)
-        self.deb_month_list.set("month")
-        month = ttk.Combobox(deb_inputs, width=14, textvariable=self.deb_month_list)
-        month['values'] = [i for i in range(1, 13)]
-        month.grid(column=2, row=1)
-        # years options button
-        self.deb_year_list = IntVar(None)
-        self.deb_year_list.set("year")
-        year = ttk.Combobox(deb_inputs, width=14, textvariable=self.deb_year_list)
-        year['values'] = [i for i in range(1996, 2031)]
-        year.grid(column=3, row=1)
-        # hours options button
-        self.deb_hours_list = IntVar(None)
-        self.deb_hours_list.set("hours")
-        hours = ttk.Combobox(deb_inputs, width=14, textvariable=self.deb_hours_list)
-        hours['values'] = [i for i in range(1, 24)]
-        hours.grid(column=1, row=2)
-        # minuts options button
-        self.deb_minuts_list = IntVar(None)
-        self.deb_minuts_list.set("minutes")
-        minuts = ttk.Combobox(deb_inputs, width=14, textvariable=self.deb_minuts_list)
-        minuts['values'] = [i for i in range(1, 60)]
-        minuts.grid(column=2, row=2)
-        # seconds options button
-        self.deb_seconds_list = IntVar(None)
-        self.deb_seconds_list.set("seconds")
-        seconds = ttk.Combobox(deb_inputs, width=14, textvariable=self.deb_seconds_list)
-        seconds['values'] = [i for i in range(1, 60)]
-        seconds.grid(column=3, row=2)
-        # sa, ecc, inc, raan, argp, nu, yy, mm, dd, p, aa, m
         # labels
-        deb_sem_lbl = ttk.Label(deb_inputs, text='Semi-major axis :    ').grid(column=0, row=3, padx=10, sticky=W)
+        deb_sem_lbl = ttk.Label(deb_inputs, text='Semi-major axis :    ').grid(column=0, row=0, padx=10, sticky=W)
         self.deb_sem_enter = ttk.Entry(deb_inputs, justify='center', width=17)
-        self.deb_sem_enter.grid(column=1, row=3)
-        deb_ecc_lbl = ttk.Label(deb_inputs, text='Eccentricity :       ').grid(column=2, row=3, padx=10, sticky=W)
+        self.deb_sem_enter.grid(column=1, row=0)
+        deb_ecc_lbl = ttk.Label(deb_inputs, text='Eccentricity :       ').grid(column=2, row=0, padx=10, sticky=W)
         self.deb_ecc_enter = ttk.Entry(deb_inputs, justify='center', width=17)
-        self.deb_ecc_enter.grid(column=3, row=3)
-        deb_inc_lbl = ttk.Label(deb_inputs, text='Inclination :        ').grid(column=0, row=4, padx=10, sticky=W)
+        self.deb_ecc_enter.grid(column=3, row=0)
+        deb_inc_lbl = ttk.Label(deb_inputs, text='Inclination :        ').grid(column=0, row=1, padx=10, sticky=W)
         self.deb_inc_enter = ttk.Entry(deb_inputs, justify='center', width=17)
-        self.deb_inc_enter.grid(column=1, row=4)
-        deb_raa_lbl = ttk.Label(deb_inputs, text='Right Ascension :    ').grid(column=2, row=4, padx=10, sticky=W)
+        self.deb_inc_enter.grid(column=1, row=1)
+        deb_raa_lbl = ttk.Label(deb_inputs, text='Right Ascension :    ').grid(column=2, row=1, padx=10, sticky=W)
         self.deb_raa_enter = ttk.Entry(deb_inputs, justify='center', width=17)
-        self.deb_raa_enter.grid(column=3, row=4)
-        deb_arp_lbl = ttk.Label(deb_inputs, text='Argument Perigee :').grid(column=0, row=5, padx=10, sticky=W)
+        self.deb_raa_enter.grid(column=3, row=1)
+        deb_arp_lbl = ttk.Label(deb_inputs, text='Argument Perigee :').grid(column=0, row=2, padx=10, sticky=W)
         self.deb_arp_enter = ttk.Entry(deb_inputs, justify='center', width=17)
-        self.deb_arp_enter.grid(column=1, row=5)
-        deb_tru_lbl = ttk.Label(deb_inputs, text='True Anomaly :       ').grid(column=2, row=5, padx=10, sticky=W)
+        self.deb_arp_enter.grid(column=1, row=2)
+        deb_tru_lbl = ttk.Label(deb_inputs, text='True Anomaly :       ').grid(column=2, row=2, padx=10, sticky=W)
         self.deb_tru_enter = ttk.Entry(deb_inputs, justify='center', width=17)
-        self.deb_tru_enter.grid(column=3, row=5)
+        self.deb_tru_enter.grid(column=3, row=2)
         # result
 
         def deb_save():
@@ -672,16 +642,15 @@ class Debris():
             except AttributeError:
                 x = 1
 
-
         def deb_plotter():
             try:
                 self.deb_visi_resu.delete('0.0', END)
                 sa, ecc, inc = float(self.deb_sem_enter.get()), float(self.deb_ecc_enter.get()), float(self.deb_inc_enter.get())
                 raan, argp, nu = float(self.deb_raa_enter.get()), float(self.deb_arp_enter.get()), float(self.deb_tru_enter.get())
-                yy, mm, dd = self.deb_year_list.get(), self.deb_month_list.get(), self.deb_day_list.get()
-                hh, mn, ss = self.deb_hours_list.get(), self.deb_minuts_list.get(), self.deb_seconds_list.get()
-                x = deb_plot(sa, ecc, inc, raan, argp, nu, yy, mm, dd, hh, mn, ss)
-                self.deb_visi_resu.insert(END, deb_info(sa))
+                rA = sa * (ecc + 1)
+                rP = sa * (1 - ecc)
+                x = deb_plot(rP, rA, raan, nu, argp, inc, 1, 100, 'instant')
+                self.deb_visi_resu.insert(END, deb_info(rP, rA))
             except ValueError:
                 self.deb_visi_resu.delete('0.0', END)
                 self.deb_visi_resu.insert(END, "Invalid Input Number, please make sure that all inputs are valid or numbers")
@@ -692,7 +661,7 @@ class Debris():
         deb_visi_save.grid(row=8, column=0, sticky=N, padx=0, pady=0)
         dep_frame = ttk.Frame(deb_outputs)
         dep_frame.grid(row=7, column=1, ipadx=10, ipady=0, sticky="NSEW", rowspan=3, columnspan=3)
-        self.deb_visi_resu = Text(dep_frame, wrap="none", width=82, height=19, font=("Times New Roman", 10), relief="solid")
+        self.deb_visi_resu = Text(dep_frame, wrap="none", width=82, height=22, font=("Times New Roman", 10), relief="solid")
         vsb_dep = ttk.Scrollbar(dep_frame, command=self.deb_visi_resu.yview, orient="vertical")
         self.deb_visi_resu.configure(yscrollcommand=vsb_dep.set)
         dep_frame.grid_rowconfigure(0, weight=1)
@@ -703,7 +672,7 @@ class Debris():
             deb_inputs.columnconfigure(col, weight=1)
         for col in range(4):
             deb_outputs.columnconfigure(col, weight=1)
-        for row in range(5):
+        for row in range(3):
             deb_inputs.rowconfigure(row, weight=1)
         for row in range(4):
             deb_outputs.rowconfigure(row, weight=1)
@@ -721,46 +690,6 @@ class Orbit():
         vis_inputs.grid(column=0, row=0, columnspan=2, sticky="WE", padx=5, pady=0, ipadx=0, ipady=0)
         vis_outputs = ttk.LabelFrame(self.tab6, text="result")
         vis_outputs.grid(column=0, row=1, columnspan=2, sticky="WE", padx=5, pady=0, ipadx=0, ipady=0)
-        # date
-        visi_date = ttk.Label(vis_inputs, text="Date :                 ")
-        visi_date.grid(column=0, row=1, padx=10, sticky=W)
-        # day
-        self.orb_day_list = IntVar()
-        self.orb_day_list.set("day")
-        day = ttk.Combobox(vis_inputs, width=14, textvariable=self.orb_day_list)
-        day['values'] = [i for i in range(1, 32)]
-        day.grid(column=1, row=1)
-        # months options button
-        self.orb_month_list = IntVar(None)
-        self.orb_month_list.set("month")
-        month = ttk.Combobox(vis_inputs, width=14, textvariable=self.orb_month_list)
-        month['values'] = [i for i in range(1, 13)]
-        month.grid(column=2, row=1)
-        # years options button
-        self.orb_year = IntVar(None)
-        self.orb_year.set("year")
-        year = ttk.Combobox(vis_inputs, width=14, textvariable=self.orb_year)
-        year['values'] = [i for i in range(1996, 2031)]
-        year.grid(column=3, row=1)
-        # hours options button
-        self.orb_hours = IntVar(None)
-        self.orb_hours.set("hours")
-        hours = ttk.Combobox(vis_inputs, width=14, textvariable=self.orb_hours)
-        hours['values'] = [i for i in range(1, 24)]
-        hours.grid(column=1, row=2)
-        # hours options button
-        self.orb_minuts = IntVar(None)
-        self.orb_minuts.set("minutes")
-        minuts = ttk.Combobox(vis_inputs, width=14, textvariable=self.orb_minuts)
-        minuts['values'] = [i for i in range(1, 60)]
-        minuts.grid(column=2, row=2)
-        # hours options button
-        self.orb_seconds = IntVar(None)
-        self.orb_seconds.set("seconds")
-        seconds = ttk.Combobox(vis_inputs, width=14, textvariable=self.orb_seconds)
-        seconds['values'] = [i for i in range(1, 60)]
-        seconds.grid(column=3, row=2)
-        # sa, ecc, inc, raan, argp, nu, yy, mm, dd, p, aa, m
         # labels
         sem_lbl = ttk.Label(vis_inputs, text='Semi-major axis :    ').grid(column=0, row=3, padx=10, sticky=W)
         self.orb_sem_enter = ttk.Entry(vis_inputs, justify='center', width=17)
@@ -783,12 +712,6 @@ class Orbit():
         prd_lbl = ttk.Label(vis_inputs, text='Number of Tours :    ').grid(column=0, row=6, padx=10, sticky=W)
         self.orb_prd_enter = ttk.Entry(vis_inputs, justify='center', width=17)
         self.orb_prd_enter.grid(column=1, row=6)
-        mas_lbl = ttk.Label(vis_inputs, text='Mass Kg :            ').grid(column=2, row=6, padx=10, sticky=W)
-        self.orb_mas_enter = ttk.Entry(vis_inputs, justify='center', width=17)
-        self.orb_mas_enter.grid(column=3, row=6)
-        are_lbl = ttk.Label(vis_inputs, text='Area m^2 :           ').grid(column=0, row=7, padx=10, sticky=W)
-        self.orb_are_enter = ttk.Entry(vis_inputs, justify='center', width=17)
-        self.orb_are_enter.grid(column=1, row=7)
         # result
 
         def visi_save():
@@ -807,11 +730,13 @@ class Orbit():
                 self.orb_visi_resu.delete('0.0', END)
                 sa, ecc, inc = float(self.orb_sem_enter.get()), float(self.orb_ecc_enter.get()), float(self.orb_inc_enter.get())
                 raan, argp, nu = float(self.orb_raa_enter.get()), float(self.orb_arp_enter.get()), float(self.orb_tru_enter.get())
-                p, aa, m = float(self.orb_prd_enter.get()), float(self.orb_are_enter.get()), float(self.orb_mas_enter.get())
-                yy, mm, dd = self.orb_year.get(), self.orb_month_list.get(), self.orb_day_list.get()
-                hh, mn, ss = self.orb_hours.get(), self.orb_month.get(), self.orb_seconds.get()
-                x = orb_calc(sa, ecc, inc, raan, argp, nu, yy, mm, dd, hh, mn, ss, p, aa, m)
-                self.orb_visi_resu.insert(END, orb_info_ri(sa, ecc, inc, raan, argp, nu, yy, mm, dd, hh, mn, ss))
+                n_p = int(self.orb_prd_enter.get())
+                rA = sa * (ecc + 1)
+                rP = sa * (1 - ecc)
+                x = orb_calc(rP, rA, raan, nu, argp, inc, n_p, 100, "instant")
+                p = sa * (1 - ecc ** 2)
+                h = sqrt(p * 398600)
+                self.orb_visi_resu.insert(END, orb_info_ri(h, sa, ecc, inc, raan, argp, nu))
             except ValueError:
                 self.orb_visi_resu.delete('0.0', END)
                 self.orb_visi_resu.insert(END, "Invalid Input Number, please make sure that all inputs are valid or numbers")
@@ -822,7 +747,7 @@ class Orbit():
         visi_save.grid(row=10, column=0, sticky=N, padx=0, pady=0)
         visio_frame = ttk.Frame(vis_outputs)
         visio_frame.grid(row=9, column=1, ipadx=10, ipady=0, sticky="NSEW", rowspan=3, columnspan=3)
-        self.orb_visi_resu = Text(visio_frame, wrap="none", width=82, height=16, font=("Times New Roman", 10), relief="solid")
+        self.orb_visi_resu = Text(visio_frame, wrap="none", width=82, height=20, font=("Times New Roman", 10), relief="solid")
         vsb_visio = ttk.Scrollbar(visio_frame, command=self.orb_visi_resu.yview, orient="vertical")
         self.orb_visi_resu.configure(yscrollcommand=vsb_visio.set)
         visio_frame.grid_rowconfigure(0, weight=1)
