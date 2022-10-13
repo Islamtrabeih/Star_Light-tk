@@ -26,10 +26,10 @@
      inkscape:pageopacity="0"
      inkscape:pagecheckerboard="0"
      inkscape:document-units="px"
-     showgrid="true"
+     showgrid="false"
      inkscape:zoom="1.5655998"
-     inkscape:cx="104.11345"
-     inkscape:cy="105.07155"
+     inkscape:cx="61.318352"
+     inkscape:cy="154.25398"
      inkscape:window-width="1366"
      inkscape:window-height="702"
      inkscape:window-x="0"
@@ -41,7 +41,8 @@
      inkscape:snap-intersection-paths="true"
      inkscape:snap-smooth-nodes="true"
      inkscape:showpageshadow="2"
-     inkscape:deskcolor="#505050">
+     inkscape:deskcolor="#505050"
+     showguides="true">
     <inkscape:grid
        type="xygrid"
        id="grid892" />
