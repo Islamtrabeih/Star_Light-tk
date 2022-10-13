@@ -13,11 +13,6 @@ The main Project stil private and have more features.
 - **Reddit:**   [@Star_Light](https://0000)
 
 
-## Screenshots [Windows 7]:
-![Star Light 2 00_07_30 20210728-160411](https://user-images.githubusercontent.com/102483385/190896929-8e63b9c6-dbaa-4f1b-b400-5a690d8a110a.png)
-![Star Light 2 00_01_56 20210728-160611](https://user-images.githubusercontent.com/102483385/190896922-3a8f64bb-461a-473e-af4c-fc18355c392f.png)
-![Star Light 2 00_03_07 20210728-160534](https://user-images.githubusercontent.com/102483385/190896928-ec9598a8-1113-4f44-959d-92b1377d8068.png)
-
 ## Screenshots [Linux Solus]:
 ![01](https://user-images.githubusercontent.com/102483385/190995499-3fab2153-7cba-49bf-8ff8-d446666849df.png)
 ![02](https://user-images.githubusercontent.com/102483385/190995504-a516bb09-0e3e-49a6-a49b-21a889c1f22b.png)
