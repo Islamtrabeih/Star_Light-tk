@@ -1,0 +1,1 @@
+pyinstaller --noconfirm --onefile --windowed --name "Star_Light-tk" --debug "imports" --add-data "/$HOME/$USER/Documents/Star_Light-tk/star_tk:star_tk/" --exclude-module "PyQt5" --exclude-module "cryptography" --add-data "/$HOME/$USER/Documents/Star_Light-tk/star.png:."  "/$HOME/$USER/Documents/Star_Light-tk/entry.py"
