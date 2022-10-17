@@ -14,7 +14,6 @@ The main Project stil private and have more features.
 
 
 ## Screenshots [Linux]:
-![Screenshot_20221017_203653](https://user-images.githubusercontent.com/102483385/196264466-b89fb483-f25f-4b96-99df-0d125ca8b5df.png)
 ![Screenshot_20221017_203722](https://user-images.githubusercontent.com/102483385/196264480-0215068c-d943-47ec-b196-6b8a246b187c.png)
 ![Screenshot_20221017_204252](https://user-images.githubusercontent.com/102483385/196264499-91a2cf7f-bc8c-4845-b4e7-ae4a77d04962.png)
 ![Screenshot_20221017_204351](https://user-images.githubusercontent.com/102483385/196264523-193f1a85-9fe1-4ff8-b07d-f1a9efbe39f9.png)
