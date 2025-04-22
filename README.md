@@ -3,7 +3,7 @@
 Star_Light is UI Application that Analyses the Satellite track and Space Environment Hazards forecasting.
 This version is a light weight track of the main project [Star_Light].
 
-## The light waight UI of Star_Light Project.
+## The Lite UI Version of Star_Light Project.
 The main Project stil private and have more features.
 
 
